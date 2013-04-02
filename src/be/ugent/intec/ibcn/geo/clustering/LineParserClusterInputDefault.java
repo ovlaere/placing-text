@@ -1,6 +1,6 @@
 package be.ugent.intec.ibcn.geo.clustering;
 
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParserPoint;
 
 /**
@@ -24,9 +24,9 @@ public class LineParserClusterInputDefault extends LineParserPoint {
      * Implementation of parse.
      */
     @Override
-    public DataItem parse(String line) {
+    public Point parse(String line) {
         // Prepare an empty DataItem.
-        DataItem item = null;
+        Point item = null;
         try {
             // Split the line
             String [] values = pattern_comma.split(line.toLowerCase());
@@ -37,7 +37,7 @@ public class LineParserClusterInputDefault extends LineParserPoint {
             // Parse latitude from index 3
             double lon = Double.parseDouble(values[3]);
             // Instantiate the DataItem
-            item = new DataItem(id, lat, lon, null);
+            item = new Point(id, lat, lon);
         }
         // In case a parse error occurs, ignore the error but mark this error.
         // At the end of the data loading, this error count will be presented
