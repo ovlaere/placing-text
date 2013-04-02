@@ -7,7 +7,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- *
+ * This class provides the generic (and common) functionality of the clustering
+ * algorithms in this framework.
+ * 
+ * In the current version of the clustering package, the input data is read
+ * into an array. Although this has been tested to input sizes of millions of
+ * training items, this introduced a bottleneck to the size of training files
+ * that can be handled.
+ * 
+ * Depending on the size of the input data you want to cluster, it is mandatory
+ * to increase the -Xmx VM parameter to avoid OutOfMemoryExceptions.
+ * 
  * Note: the current clustering format is just a list of the medoids, i.e. the 
  * id's, latitude and longitude of the training items that are the cluster
  * centra. In the rest of the framework, an on the fly association is made using
@@ -27,56 +37,70 @@ public abstract class AbstractClustering {
         System.out.println("[ Available CPU's: " + NR_THREADS + " ]");
     }
     
+    /**
+     * Holds a reference to the input data.
+     */
     protected Point [] data;
     
+    /**
+     * Reference to the ClusteringParameters, used for intra-cluster optimization.
+     */
     protected ClusteringParameters parameters;
     
+    /**
+     * Constructor.
+     * @param parameters parameters used for optimization
+     */
     public AbstractClustering(ClusteringParameters parameters) {
         this.parameters = parameters;
     }
     
+    /**
+     * Abstract method declaration for the actual clustering call.
+     * @param outputfile Filename of the file that will contain the clustering
+     */
     public abstract void cluster(String outputfile);
     
     /**
-     * Helper class that allows multi-threaded optimization of separate Clusters.
+     * Helper class that allows multi-threaded optimization of individual Clusters.
      * This class will search for a cluster center that minimizes the overall
      * cluster cost.
      * An iteration limit of 100 iteration is used by default, as well as a sampling
      * in case that more than 512 elements are in the collection.
+     * 
+     * @see ClusteringParameters
      */
     protected class ClusterOptimizer implements Runnable{
 
         /**
-        * Default max number of points to process by each of the threads.
-        */
-        private int sample_limit = parameters.optimization_overall_sample_limit 
-                / NR_THREADS;
+         * Default max number of points to process by each of the threads.
+         */
+        private int sample_limit = 
+                parameters.optimization_overall_sample_limit / NR_THREADS;
 
         /**
-        * Keeps track of the Cluster this Thread is optimizing.
-        */
-        private Cluster cluster;
+         * Keeps track of the Cluster this Thread is optimizing.
+         */
+        protected Cluster cluster;
 
         /**
-        * @param cluster the Cluster this Thread is optimizing.
-        */
+         * @param cluster the Cluster this Thread is optimizing.
+         */
         public ClusterOptimizer(Cluster cluster) {
             this.cluster = cluster;
         }
 
         /**
-        * run() implementation.
-        * This method will optimize a specified cluster in a multi-threaded way:
-        * it will split the elements of the Cluster into different sublists
-        * that will be processed by multiple threads. The results of all
-        * threads are then matched against each other, and the overall best
-        * configuration is stored.
-        */
-        @SuppressWarnings("unchecked")
+         * run() implementation.
+         * This method will optimize a specified cluster in a multi-threaded way:
+         * it will split the elements of the Cluster into different sublists
+         * that will be processed by multiple threads. The results of all
+         * threads are then matched against each other, and the overall best
+         * configuration is stored.
+         */
         @Override
         public void run() {
-            // Assume another iteration is needed
-            boolean runMore = true;
+            boolean runMore;
             // Keep track of the iterations
             int iterations = 0;
             do {
@@ -87,6 +111,7 @@ public abstract class AbstractClustering {
                 // Initialize placeholders for the best configuration
                 Point bestCenter = cluster.getCenter();
                 double cost = cluster.calculateCost();
+                double original_cost = cost;
 
                 // Make a copy of the datapoints because we are iterating over the list
                 List<Point> datapoints = new ArrayList<Point>(cluster.getElements());
@@ -132,11 +157,7 @@ public abstract class AbstractClustering {
                 }
                 // In case the new best center differs from the current best
                 if (bestCenter != cluster.getCenter()) {
-                    // - Process the cluster change
-                    cluster.swapCenter(bestCenter);
-                    // Mark this as a change to inform that a new iteration is
-                    // needed
-                    runMore = true;
+                    runMore = finalSwap(bestCenter, cluster, original_cost, cost);
                 }
                 // clear the possibility to undo the swap...
                 cluster.clearUndoSwap();
@@ -146,57 +167,77 @@ public abstract class AbstractClustering {
         }
 
         /**
-        * Helper class that allows multi-threaded optimization of separate Clusters.
-        * This class will search for a cluster center that minimizes the overall
-        * cluster cost.
-        */
-        private class ClusterOptimizerHelper extends Thread {
+         * Helper method that processes the case where a cluster medoid should be
+         * replace with a better one. The default behaviour for optimization is
+         * specified in this implementation, which can be overridden by other
+         * implementations.
+         * @param bestCenter Best center so far
+         * @param cluster Cluster object
+         * @param original_cost 
+         * @param cost
+         * @return always true if a swap was made. The default optimization runs until the 
+         * iteration limit is hit.
+         */
+        protected boolean finalSwap(Point bestCenter, Cluster cluster, 
+            double original_cost, double cost) {
+            // - Process the cluster change
+            cluster.swapCenter(bestCenter);
+            // Mark this as a change to inform that a new iteration is needed
+            return true;
+        }
+        
+        /**
+         * Helper class that allows multi-threaded optimization of separate Clusters.
+         * This class will search for a cluster center that minimizes the overall
+         * cluster cost.
+         */
+        protected class ClusterOptimizerHelper extends Thread {
 
             /**
-            * A list of Points that are possible center candidates.
-            */
+             * A list of Points that are possible center candidates.
+             */
             private List<Point> datapoints;
 
             /**
-            * A copy of the original Cluster to be optimized.
-            */
+             * A copy of the original Cluster to be optimized.
+             */
             private Cluster cluster;
 
             /**
-            * Keeps track of the best Cluster cost.
-            */
+             * Keeps track of the best Cluster cost.
+             */
             private double cost;
 
             /**
-            * @return the best Cluster cost found so far.
-            */
+             * @return the best Cluster cost found so far.
+             */
             public double getBestCost() {
                 return this.cost;
             }
 
             /**
-            * Keeps track of the Point that leads to the minimal Cluster cost.
-            */
+             * Keeps track of the Point that leads to the minimal Cluster cost.
+             */
             private Point bestCenter = null;
 
             /**
-            * @return the Point that leads to the minimal Cluster cost.
-            */
+             * @return the Point that leads to the minimal Cluster cost.
+             */
             public Point getBestCenter() {
                 return this.bestCenter;
             }
 
             /**
-            * Keeps track of the sample size to use.
-            */
+             * Keeps track of the sample size to use.
+             */
             private int sample_count;
 
             /**
-            * Constructor.
-            * @param datapoints A list of Points that are possible center candidates
-            * @param cluster A copy of the original Cluster to be optimized.
-            * @param sample_count Sample size to use.
-            */
+             * Constructor.
+             * @param datapoints A list of Points that are possible center candidates
+             * @param cluster A copy of the original Cluster to be optimized.
+             * @param sample_count Sample size to use.
+             */
             public ClusterOptimizerHelper(List<Point> datapoints, Cluster cluster, int sample_count) {
                 this.datapoints = datapoints;
                 this.cluster = cluster;
@@ -206,10 +247,10 @@ public abstract class AbstractClustering {
             }
 
             /**
-            * run() implementation.
-            * Will try every possible center Point and store the optimal configuration.
-            * In case sample_count < datapoints.size(), sampling will be applied.
-            */
+             * run() implementation.
+             * Will try every possible center Point and store the optimal configuration.
+             * In case sample_count < datapoints.size(), sampling will be applied.
+             */
             @Override
             public void run() {
                 // Init and seed a random generator

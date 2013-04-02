@@ -93,4 +93,26 @@ public class ClusteringParameters {
     public String getLineParserClassNameForInput() {
         return lineParserClassNameForInput;
     }
+    
+    /**
+     * If set to true, all clustering info will be writte to file. This is handy
+     * for plotting the clustering and debugging, but should be set to false
+     * for a usable file format for the rest of the framework.
+     */
+    protected boolean writeFullClusteringToFile = false;
+
+    /**
+     * @return false if only the medoids are written to file.
+     */
+    public boolean isWriteFullClusteringToFile() {
+        return writeFullClusteringToFile;
+    }
+
+    /**
+     * Set whether only the medoids are written to file, or all the clustering info.
+     * @param writeFullClusteringToFile 
+     */
+    public void setWriteFullClusteringToFile(boolean writeFullClusteringToFile) {
+        this.writeFullClusteringToFile = writeFullClusteringToFile;
+    }
 }

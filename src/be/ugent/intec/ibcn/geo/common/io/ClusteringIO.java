@@ -319,15 +319,36 @@ public class ClusteringIO {
         }
     }
     
+    /**
+     * Helper method that facilitates writing a given grid-clustering to file.
+     * @param clusters The resulting clusters from the algorithm
+     * @param outputfile The name of the file to write the clusters to.
+     */
     public void writeClusteringToFile(Map<Long, Cluster> clusters, String outputfile) {
-        // Write to file
+        writeClusteringToFile(clusters, outputfile, false);
+    }
+
+    /**
+     * Helper method that facilitates writing a given grid-clustering to file.
+     * @param clusters The resulting clusters from the algorithm
+     * @param outputfile The name of the file to write the clusters to.
+     * @param fullWrite If set to true, not only the ID,lat,lon will be written to file,
+     * but all the elements in the cluster as well. This is mainly for visualization and
+     * debugging purposes only.
+     */
+    public void writeClusteringToFile(Map<Long, Cluster> clusters, String outputfile, boolean fullWrite) {
         try {
             PrintWriter file = new PrintWriter(new FileWriter(outputfile));
             for (Cluster c : clusters.values()) {
-                // Write the center data to file
-                Point center = c.getCenter();
-                file.println(center.getId() + "," + center.getLatitude() + "," 
-                        + center.getLongitude());
+                if (fullWrite) {
+                    file.println(c.toString());
+                }
+                else {
+                    // Write the center data to file
+                    Point center = c.getCenter();
+                    file.println(center.getId() + "," + center.getLatitude() + "," 
+                            + center.getLongitude());
+                }
             }
             file.close();
         }
@@ -337,4 +358,42 @@ public class ClusteringIO {
         }
     }
     
+    /**
+     * Helper method that facilitates writing a given clustering to file.
+     * @param clusters The resulting clusters from the algorithm
+     * @param outputfile The name of the file to write the clusters to.
+     */
+    public void writeClusteringToFile(List<Cluster> clusters, String outputfile) {
+        writeClusteringToFile(clusters, outputfile, false);
+    }
+    
+    /**
+     * Helper method that facilitates writing a given clustering to file.
+     * @param clusters The resulting clusters from the algorithm
+     * @param outputfile The name of the file to write the clusters to.
+     * @param fullWrite If set to true, not only the ID,lat,lon will be written to file,
+     * but all the elements in the cluster as well. This is mainly for visualization and
+     * debugging purposes only.
+     */
+    public void writeClusteringToFile(List<Cluster> clusters, String outputfile, boolean fullWrite) {
+        try {
+            PrintWriter file = new PrintWriter(new FileWriter(outputfile));
+            for (Cluster c : clusters) {
+                if (fullWrite) {
+                    file.println(c.toString());
+                }
+                else {
+                    // Write the center data to file
+                    Point center = c.getCenter();
+                    file.println(center.getId() + "," + center.getLatitude() + "," 
+                            + center.getLongitude());
+                }
+            }
+            file.close();
+        }
+        catch (IOException e) {
+            System.err.println("Error writing clustering to file: " + e.getMessage());
+            System.exit(-1);
+        }
+    }    
 }

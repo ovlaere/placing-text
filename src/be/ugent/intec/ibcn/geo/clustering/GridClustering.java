@@ -178,7 +178,7 @@ public class GridClustering extends AbstractClustering {
 
         // Write to file
         ClusteringIO cio = new ClusteringIO();
-        cio.writeClusteringToFile(clusters, outputfile);
+        cio.writeClusteringToFile(clusters, outputfile, parameters.writeFullClusteringToFile);
 
         // Stop the timer
         long overall_stop = System.currentTimeMillis();

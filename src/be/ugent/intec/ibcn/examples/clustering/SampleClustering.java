@@ -2,7 +2,8 @@ package be.ugent.intec.ibcn.examples.clustering;
 
 import be.ugent.intec.ibcn.geo.clustering.AbstractClustering;
 import be.ugent.intec.ibcn.geo.clustering.ClusteringParameters;
-import be.ugent.intec.ibcn.geo.clustering.GridClustering;
+import be.ugent.intec.ibcn.geo.clustering.PamClustering;
+import be.ugent.intec.ibcn.geo.clustering.PamParameters;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
 
@@ -11,6 +12,9 @@ import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
  * 
  * Depending on the amount of input data, you might want to set the -Xmx (and
  * most likely -Xms) VM parameters to a higher value than the default one.
+ * 
+ * The input file needs to contain at least info such as ID,lat,lon for each
+ * training item.
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
@@ -22,10 +26,12 @@ public class SampleClustering {
         // But we set out own input parser
         cp.setLineParserClassNameForInput(
                 "be.ugent.intec.ibcn.examples.clustering.MyClusterInputParser");
+        
         // Provide the full path and filename of your training data
 //        String inputfile = "<your file here>";
         
         String inputfile = "/Users/ovlaere/achterberg/workspaces/netbeans/Curiosity/data/placing2012_generic/data_mediaeval2012_training.txt.run1";
+//        String inputfile = "/home/ovlaere/gir/data/placing2012_generic/data_mediaeval2012_training.txt.run1";
         
         // Prepare the ClusteringIO
         ClusteringIO cio = new ClusteringIO();
@@ -35,23 +41,32 @@ public class SampleClustering {
          */
         
         // Load all the data from the file to cluster
-//        Point [] data = cio.loadDataFromFile(inputfile, 
-//                cp.getLineParserClassNameForInput());
+//        Point [] data = cio.loadDataFromFile(inputfile, cp.getLineParserClassNameForInput());
         
         // You could also load the first x lines of your training data using
         int x = 100000;
-        Point [] data = cio.loadDataFromFile(inputfile, 
-                cp.getLineParserClassNameForInput(), x);
+        Point [] data = cio.loadDataFromFile(inputfile, cp.getLineParserClassNameForInput(), x);
         
         // Set your outpufile
         String outputfile = "/Users/ovlaere/achterberg/workspaces/netbeans/Curiosity/data/placing2012_generic/test_clustering";
+//        String outputfile = "test_clustering";
         
-        // Example of GridClustering with 1 degree latitude and 1 degree longitude
+        /**
+         * Example of GridClustering with 1 degree latitude and 1 degree longitude
+         */
         
-        AbstractClustering clusteringGrid = new GridClustering(cp, data, 1, 1);
-        clusteringGrid.cluster(outputfile + ".grid");
+//        AbstractClustering clusteringGrid = new GridClustering(cp, data, 1, 1);
+//        clusteringGrid.cluster(outputfile + ".grid");
         
-        
-        
+        /**
+         * Example of PamClustering
+         */
+        // Special PamParameters are needed here
+        PamParameters pp = new PamParameters();
+        pp.setWriteFullClusteringToFile(true);
+        // Init a Pam with k = 2500
+        int k = 2500;
+        AbstractClustering clusteringPam = new PamClustering(pp, data, k);
+        clusteringPam.cluster(outputfile + ".pam");
     }
 }
