@@ -1,7 +1,9 @@
 package be.ugent.intec.ibcn.geo.clustering;
 
 /**
- *
+ * This class extends the default clustering parameters with some parameters
+ * that are typical for the PAM clustering algorithm.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class PamParameters extends ClusteringParameters {
