@@ -22,7 +22,7 @@ public class Coordinate {
     /**
      * Id of this Coordinate.
      */
-    private int id;
+    protected int id;
 
     /**
      * @return the Id of this Coordinate.
@@ -42,7 +42,7 @@ public class Coordinate {
     /**
      * x-component
      */
-    private double x;
+    protected double x;
 
     /**
      * @return the x-component of this cartesian Coordinate
@@ -62,7 +62,7 @@ public class Coordinate {
     /**
      * y-component
      */
-    private double y;
+    protected double y;
 
     /**
      * @return the y-component of this cartesian Coordinate
@@ -82,7 +82,7 @@ public class Coordinate {
     /**
      * y-component
      */
-    private double z;
+    protected double z;
 
     /**
      * @return the z-component of this cartesian Coordinate

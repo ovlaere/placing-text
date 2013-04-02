@@ -1,9 +1,6 @@
 package be.ugent.intec.ibcn.examples.clustering;
 
-import be.ugent.intec.ibcn.geo.clustering.AbstractClustering;
-import be.ugent.intec.ibcn.geo.clustering.ClusteringParameters;
-import be.ugent.intec.ibcn.geo.clustering.PamClustering;
-import be.ugent.intec.ibcn.geo.clustering.PamParameters;
+import be.ugent.intec.ibcn.geo.clustering.*;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
 
@@ -28,40 +25,34 @@ public class SampleClustering {
                 "be.ugent.intec.ibcn.examples.clustering.MyClusterInputParser");
         
         // Provide the full path and filename of your training data
-//        String inputfile = "<your file here>";
-        
-        String inputfile = "/Users/ovlaere/achterberg/workspaces/netbeans/Curiosity/data/placing2012_generic/data_mediaeval2012_training.txt.run1";
-//        String inputfile = "/home/ovlaere/gir/data/placing2012_generic/data_mediaeval2012_training.txt.run1";
+        String inputfile = "<your file here>";
+        // Provide the full path and filename for the output
+        String outputfile = "<your file here>";
         
         // Prepare the ClusteringIO
         ClusteringIO cio = new ClusteringIO();
         
-        /*
+        /**
          * Load the input data
          */
         
         // Load all the data from the file to cluster
-//        Point [] data = cio.loadDataFromFile(inputfile, cp.getLineParserClassNameForInput());
+        Point [] data = cio.loadDataFromFile(inputfile, cp.getLineParserClassNameForInput());
         
         // You could also load the first x lines of your training data using
-        int x = 100000;
-        Point [] data = cio.loadDataFromFile(inputfile, cp.getLineParserClassNameForInput(), x);
-        
-        // Set your outpufile
-        String outputfile = "/Users/ovlaere/achterberg/workspaces/netbeans/Curiosity/data/placing2012_generic/test_clustering";
-//        String outputfile = "test_clustering";
+//        int x = 100000;
+//        Point [] data = cio.loadDataFromFile(inputfile, cp.getLineParserClassNameForInput(), x);
         
         /**
          * Example of GridClustering with 1 degree latitude and 1 degree longitude
          */
         
-//        AbstractClustering clusteringGrid = new GridClustering(cp, data, 1, 1);
-//        clusteringGrid.cluster(outputfile + ".grid");
+        AbstractClustering clusteringGrid = new GridClustering(cp, data, 1, 1);
+        clusteringGrid.cluster(outputfile + ".grid");
         
         /**
-         * Example of PamClustering
+         * Example of PamClustering. This one need special PamParameters.
          */
-        // Special PamParameters are needed here
         PamParameters pp = new PamParameters();
         pp.setWriteFullClusteringToFile(true);
         // Init a Pam with k = 2500
