@@ -3,10 +3,7 @@ package be.ugent.intec.ibcn.geo.features;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
 import be.ugent.intec.ugent.ibcn.geo.common.ClassMapper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 
@@ -16,6 +13,16 @@ public class OverallTagCounter {
     private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
     
     private Map<Object, Integer> map;
+    
+    public Set getTags() {
+        return map.keySet();
+    }
+    
+    private int total_tag_occurrences = 0;
+    
+    public int getTotalTagOccurrences() {
+        return this.total_tag_occurrences;
+    }
     
     private DataItem [] data;
     
@@ -45,6 +52,8 @@ public class OverallTagCounter {
                     else
                         // Else start a new count
                         map.put(key, result.get(key));
+                    // Track the total occurrences
+                    total_tag_occurrences += result.get(key);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
