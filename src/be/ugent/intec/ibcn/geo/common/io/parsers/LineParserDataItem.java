@@ -1,9 +1,8 @@
-package be.ugent.intec.ibcn.geo.common.interfaces;
+package be.ugent.intec.ibcn.geo.common.io.parsers;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  *

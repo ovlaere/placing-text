@@ -1,4 +1,4 @@
-package be.ugent.intec.ibcn.geo.common.interfaces;
+package be.ugent.intec.ibcn.geo.common.io.parsers;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import java.util.regex.Pattern;

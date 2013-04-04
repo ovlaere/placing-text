@@ -2,7 +2,7 @@ package be.ugent.intec.ibcn.geo.common.io;
 
 import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.interfaces.LineParserPoint;
+import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

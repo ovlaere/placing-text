@@ -3,7 +3,7 @@ package be.ugent.intec.ibcn.examples;
 import be.ugent.intec.ibcn.geo.clustering.*;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.interfaces.LineParserPoint;
+import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
 
 /**
@@ -56,7 +56,6 @@ public class ClusteringExample {
          * Example of PamClustering. This one need special PamParameters.
          */
         PamParameters pp = new PamParameters();
-        pp.setWriteFullClusteringToFile(true);
         // Init a Pam with k = 2500
         int k = 2500;
         AbstractClustering clusteringPam = new PamClustering(pp, data, k);

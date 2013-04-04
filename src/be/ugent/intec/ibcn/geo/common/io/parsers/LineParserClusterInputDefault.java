@@ -1,10 +1,10 @@
-package be.ugent.intec.ibcn.geo.clustering;
+package be.ugent.intec.ibcn.geo.common.io.parsers;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.interfaces.LineParserPoint;
+import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 
 /**
- * This class provides a default implementation of LineParserPoint.
+ * This class provides a default implementation for a LineParserPoint.
  * 
  * In this case, we provide a simple parser that fetches the ID, lat and lon
  * from each of the training items.
