@@ -7,10 +7,11 @@ import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Object capable of on the fly nearest-neighbour assignments to the medoids
@@ -190,6 +191,9 @@ public class ClassMapper {
         long t1 = System.currentTimeMillis();
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
+        // Prepare a list for the futures
+        List<Future<Map<Integer, Set<Integer>>>> list = 
+                new ArrayList<Future<Map<Integer, Set<Integer>>>>();
         // Determine block length
         int length = (int) (data.length * 1.0 / NR_THREADS);
         for (int i = 0; i < NR_THREADS; i++) {
@@ -198,8 +202,26 @@ public class ClassMapper {
                 length = data.length - (i * length);
             }
             int end = begin + length;
-            // Start helper runnables with a copy of the tree
-            executor.submit(new AttachHelper(data, begin, end, initTree(true)));
+            // Instantiate a callable, track the future, execute
+            Callable<Map<Integer, Set<Integer>>> worker = 
+                    new AttachHelper(data, begin, end, initTree(true));
+            Future<Map<Integer, Set<Integer>>> submit = executor.submit(worker);
+            list.add(submit);
+        }
+        // Now retrieve the results form the futures
+        for (Future<Map<Integer, Set<Integer>>> future : list) {
+            try {
+                // Fetch the local assignments
+                Map<Integer, Set<Integer>> local_result = future.get();
+                // Assign them for real to the correct GeoClass objects
+                for (int classId : local_result.keySet()) {
+                    classes.get(classId).addAll(local_result.get(classId));
+                }
+            }
+            catch (Exception e) {
+                System.err.println("Exception: " + e.getMessage());
+                System.exit(1);
+            }
         }
         // This will make the executor accept no new threads
         // and finish all existing threads in the queue
@@ -211,9 +233,9 @@ public class ClassMapper {
     }
     
     /**
-     * Helper Runnable for multi-threaded on the fly cluster association.
+     * Helper Callable for multi-threaded on the fly cluster association.
      */
-    private class AttachHelper implements Runnable {
+    private class AttachHelper implements Callable<Map<Integer, Set<Integer>>> {
 
         /**
          * Reference to the training data.
@@ -253,21 +275,29 @@ public class ClassMapper {
          * Actual cluster association.
          */
         @Override
-        public void run() {
+        public Map<Integer, Set<Integer>> call() throws Exception {
+            Map<Integer, Set<Integer>> assignments = 
+                    new HashMap<Integer, Set<Integer>>();
             for (int i = begin; i < end; i++) {
                 DataItem item = data[i];
                 // Sanity check
                 if (item != null) {
                     // On the fly associate the clustering, provide the tree
                     // to avoid locking on the shared tree
-                    GeoClass myClass = findClass(item, tree);
-                    // Lock on the class object
-                    synchronized(myClass) {
-                        // Add this ID to the class
-                        myClass.addElement(item.getId());
+                    int classId = findClassId(item, tree);
+                    // Fetch the set of elements for this GeoClass
+                    Set<Integer> elements = assignments.get(classId);
+                    // Init if not set is found
+                    if (elements == null) {
+                        elements = new HashSet<Integer>();
+                        assignments.put(classId, elements);
                     }
+                    // Add this element to the set
+                    elements.add(item.getId());
                 }
             }
+            // Return the local results
+            return assignments;
         }
     }
 }

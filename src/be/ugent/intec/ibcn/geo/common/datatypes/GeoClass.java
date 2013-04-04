@@ -75,11 +75,19 @@ public class GeoClass {
     }
     
     /**
-     * Add an element this this class (by ID).
+     * Add an element this class (by ID).
      * @param id ID of the element to add to this class.
      */
     public void addElement(Integer id) {
         this.elements.add(id);
+    }
+    
+    /**
+     * Add all elements.
+     * @param ids Set of ids to add as elements.
+     */
+    public void addAll(Set<Integer> ids) {
+        this.elements.addAll(ids);
     }
     
     /**
