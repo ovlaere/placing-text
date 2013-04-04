@@ -47,8 +47,8 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         System.out.println("Doing "+ getMethodName() +" feature selection.");
         // Start timer
         long start = System.currentTimeMillis();
-        // Prepare a map of lists, for each GeoClass the feature ranking
-        Map<Integer, List<Object>> class_rankings = new TreeMap<Integer, List<Object>>();
+        // Prepare an array of lists, for each GeoClass the feature ranking
+        List<Object>[] class_rankings = new ArrayList[this.classmapper.size()];
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Track futures
@@ -65,9 +65,9 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
             try {
                 ScoringResult result = future.get();
                 Map<Object, Double> class_ranking = result.getScores();
-                // Put the ranking for this class in the map
-                class_rankings.put(result.getGeoClass().getId(), 
-                        new ArrayList(class_ranking.keySet()));
+                // Put the ranking for this class in the right spot in the array
+                class_rankings[result.getGeoClass().getId()] =  
+                        new ArrayList(class_ranking.keySet());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -90,14 +90,14 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
 
     /**
      * Merge the individual rankings per class, in a round robin fashion.
-     * @param class_list_map The ranked features lists per class
+     * @param class_rankings The ranked features lists per class
      * @return a list of features
      */
-    private List<Object> mergeClassRankings(Map<Integer, List<Object>> class_rankings) {
+    private List<Object> mergeClassRankings(List<Object> [] class_rankings) {
         // Init max variable
         int max_size = 0;
         // Determine max list size
-        for (List<Object> list : class_rankings.values()) {
+        for (List<Object> list : class_rankings) {
             max_size = Math.max(max_size, list.size());
         }
         // Prepare a list of rounds, to gather the features in a round robin fashion
@@ -106,10 +106,10 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         Set<Object> uniqueTags = new HashSet<Object>();
         // round robin result aggregation
         for (int i = 0; i < max_size; i++) {
-            // For each of the GeoClasses
-            for (int classId : class_rankings.keySet()) {
+            // For each of the known classIds
+            for (int classId = 0; classId < class_rankings.length; classId++) {
                 // Fetch the feature ranking
-                List<Object> list = class_rankings.get(classId);
+                List<Object> list = class_rankings[classId];
                 // If there are tags remaining beyond round i
                 if (list.size() >= (i + 1)) {
                     // Get the tag
