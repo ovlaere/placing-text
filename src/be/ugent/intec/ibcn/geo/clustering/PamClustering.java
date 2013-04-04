@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
  *  @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0045
  *  @see http://en.wikipedia.org/wiki/K-medoids
  * 
- * The algorithm makes used of a KD-tree for retrieving the nearest neighbours. 
+ * The algorithm makes use of a KD-tree for retrieving the nearest neighbours. 
  * To download the implementation of this data structure
  *  @see http://home.wlu.edu/~levys/software/kd/
  * 

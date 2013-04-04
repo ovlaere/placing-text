@@ -1,13 +1,14 @@
 package be.ugent.intec.ibcn.geo.common.io.parsers;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
+import be.ugent.intec.ibcn.geo.common.interfaces.LineParser;
 import java.util.regex.Pattern;
 
 /**
  *
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
-public abstract class LineParserPoint {
+public abstract class LineParserPoint implements LineParser {
     
     /**
      * Precompiled regex space split pattern significantly boosts performance.
@@ -25,16 +26,19 @@ public abstract class LineParserPoint {
 
     protected int processed = 0;
 
+    @Override
     public int getProcessed() {
         return this.processed;
     }
     
     protected int errors = 0;
     
+    @Override
     public int getErrors() {
         return this.errors;
     }
     
+    @Override
     public abstract Point parse(String line);
 
 }

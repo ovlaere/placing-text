@@ -3,6 +3,7 @@ package be.ugent.intec.ibcn.geo.common.io;
 import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
+import be.ugent.intec.ugent.ibcn.geo.common.Util;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +98,7 @@ public class ClusteringIO {
     public Point[] loadDataFromFile(String filename, String lineparser, int limit) {
         System.out.println("=| Parser:  " + lineparser);
         // Fetch the number of lines to process
-        int lines = getNumberOfLines(filename);
+        int lines = FileIO.getNumberOfLines(filename);
         // Determine the number of lines to process in case a limit was set
         if (limit > 0 && limit < lines)
             lines = limit;
@@ -165,45 +166,6 @@ public class ClusteringIO {
     }
 
     /**
-     * Find out the number of lines in the given file.
-     * The linecount is supposed to be on the first line, if not, the file will
-     * be iterated to count the number of lines.
-     * @param filename Filename for which the linecount is requested,
-     * @return the linecount of the given file
-     */
-    private int getNumberOfLines(String filename) {
-        // Default to -1;
-        int lines = -1;
-        try {
-            BufferedReader in = new BufferedReader(new FileReader(filename));
-            // Parse the linecount on the first line
-            lines = Integer.parseInt(in.readLine());
-            in.close();
-        } catch (NumberFormatException e) {
-            System.out.println("Linecount not found on first line. Will loop trough the file.");
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-        // Loop through the file to find out the number of lines
-        if (lines < 0) {
-            int counter = 0;
-            try {
-                BufferedReader in = new BufferedReader(new FileReader(filename));
-                while (in.readLine() != null)
-                    counter++;
-                in.close();
-                lines = counter;
-            } catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
-            }
-        }
-        // Throw an exception in case something went wrong
-        if (lines < 0)
-            throw new RuntimeException("Missing or invalid line count for " + filename);
-        return lines;
-    }
-    
-    /**
      * Helper class that loads training lines for a part of the training file.
      */
     private class DataLoaderHelper implements Runnable{
@@ -262,15 +224,7 @@ public class ClusteringIO {
             this.end = end;
             this.filename = filename;
             // Instantiate the LineParserPoint parser
-            try {
-                this.parser = (LineParserPoint) Class.forName(lineparserpoint).newInstance();
-            } catch (InstantiationException ex) {
-                System.err.println("InstantiationException " + ex.getMessage());
-            } catch (IllegalAccessException ex) {
-                System.err.println("IllegalAccessException " + ex.getMessage());
-            } catch (ClassNotFoundException ex) {
-                System.err.println("ClassNotFoundException " + ex.getMessage());
-            }
+            this.parser = (LineParserPoint)Util.getParser(lineparserpoint);
             // First line of file should contain the number of lines in the file
             if (this.begin == 0)
                 this.begin = 1;
