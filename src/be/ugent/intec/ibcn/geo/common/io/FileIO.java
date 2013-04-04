@@ -2,7 +2,7 @@ package be.ugent.intec.ibcn.geo.common.io;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid;
-import be.ugent.intec.ugent.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.Util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;

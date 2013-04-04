@@ -1,4 +1,4 @@
-package be.ugent.intec.ugent.ibcn.geo.common;
+package be.ugent.intec.ibcn.geo.common;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.Coordinate;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
