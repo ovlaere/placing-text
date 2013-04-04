@@ -4,7 +4,7 @@ import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.DataLoading;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import be.ugent.intec.ibcn.geo.common.ClassMapper;
+import be.ugent.intec.ugent.ibcn.geo.common.ClassMapper;
 import java.util.List;
 import java.util.Random;
 

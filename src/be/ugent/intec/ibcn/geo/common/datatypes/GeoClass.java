@@ -75,7 +75,7 @@ public class GeoClass {
     }
     
     /**
-     * Add an element to this class (by ID).
+     * Add an element this this class (by ID).
      * @param id ID of the element to add to this class.
      */
     public void addElement(Integer id) {

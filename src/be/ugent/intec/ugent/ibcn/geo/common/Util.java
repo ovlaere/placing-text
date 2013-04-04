@@ -1,4 +1,4 @@
-package be.ugent.intec.ibcn.geo.common;
+package be.ugent.intec.ugent.ibcn.geo.common;
 
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParser;
 import java.util.*;
