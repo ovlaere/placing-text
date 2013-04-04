@@ -1,8 +1,8 @@
 package be.ugent.intec.ibcn.geo.features;
 
+import be.ugent.intec.ibcn.geo.common.ClassMapper;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
-import be.ugent.intec.ibcn.geo.common.ClassMapper;
 import java.util.*;
 import java.util.concurrent.*;
 

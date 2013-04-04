@@ -1,9 +1,9 @@
 package be.ugent.intec.ibcn.geo.features;
 
+import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.io.DataLoading;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
-import be.ugent.intec.ibcn.geo.common.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
