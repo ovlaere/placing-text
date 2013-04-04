@@ -415,9 +415,10 @@ public class GeoSpreadFeatureRanker {
         System.out.println("Sorting...");
         // Sort the map by value ascending
         spread_map = Util.sortByValueAscending(spread_map);
-        System.out.println("Processed features: " + spread_map.size());
-        // Export the ranking to file, format: ID - Feature
-        FeaturesIO.exportFeaturesToFile(spread_map.keySet(), outputfile);
+        // Fetch the features
+        List<Object> features = new ArrayList(spread_map.keySet());
+        // Export the features to file
+        FeaturesIO.exportFeaturesToFile(features, outputfile);        
     }
     
     /**

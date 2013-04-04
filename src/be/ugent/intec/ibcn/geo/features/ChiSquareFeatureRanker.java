@@ -22,11 +22,6 @@ import java.util.concurrent.*;
 public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
 
     /**
-     * Number of threads, for multi-threaded processing.
-     */
-    protected static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
-    
-    /**
      * @return the name of this ranking method
      */
     protected String getMethodName() {

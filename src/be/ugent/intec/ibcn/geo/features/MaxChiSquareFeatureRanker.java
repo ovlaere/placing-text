@@ -96,11 +96,8 @@ public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
         
         // Sort overall map by chi2 descending
         overall_best = Util.sortByValueDescending(overall_best);
-        // Prepare the result list
-        List<Object> features = new ArrayList();
-        for (Object tag : overall_best.keySet()) {
-            features.add(tag);
-        }
+        // Fetch the features
+        List<Object> features = new ArrayList(overall_best.keySet());
         // Export the features to file
         FeaturesIO.exportFeaturesToFile(features, outputfile);
         // Stop the timer

@@ -21,6 +21,11 @@ import java.util.Random;
 public abstract class AbstractClassLevelRanker {
 
     /**
+     * Number of threads, for multi-threaded processing.
+     */
+    protected static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    
+    /**
      * Random generator used in shuffling data.
      */
     protected Random rg = new Random(123987456L);
