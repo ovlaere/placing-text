@@ -5,7 +5,7 @@ import be.ugent.intec.ibcn.geo.common.interfaces.LineParser;
 import java.util.regex.Pattern;
 
 /**
- *
+ * TODO Add comment
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public abstract class LineParserPoint implements LineParser {

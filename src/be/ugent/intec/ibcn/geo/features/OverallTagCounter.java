@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+
+// TODO Add comment
 public class OverallTagCounter {
 
     private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();

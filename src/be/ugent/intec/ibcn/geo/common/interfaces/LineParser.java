@@ -3,7 +3,7 @@ package be.ugent.intec.ibcn.geo.common.interfaces;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 
 /**
- * Generic input data parser interface.
+ * Generic data input parser interface.
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */

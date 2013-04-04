@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * TODO Add comment + revisit use of filter?
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public abstract class LineParserDataItem extends LineParserPoint {

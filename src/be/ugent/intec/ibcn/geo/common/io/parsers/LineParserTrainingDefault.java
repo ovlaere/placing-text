@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * TODO Add comment
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class LineParserTrainingDefault extends LineParserDataItem{

@@ -3,7 +3,7 @@ package be.ugent.intec.ibcn.examples;
 import be.ugent.intec.ibcn.geo.features.*;
 
 /**
- *
+ * TODO Add comment
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class FeatureExample {

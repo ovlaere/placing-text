@@ -3,8 +3,8 @@ package be.ugent.intec.ibcn.examples;
 import be.ugent.intec.ibcn.geo.clustering.*;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
+import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 
 /**
  * This class provides a mini-howto on how to run the clustering algorithms.
