@@ -4,14 +4,13 @@ import be.ugent.intec.ibcn.geo.common.datatypes.Coordinate;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.features.MostFrequentlyUsedFeatureRanker;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Object capable of on the fly nearest-neighbour assignments to the medoids
