@@ -14,31 +14,6 @@ import java.util.Set;
 public class FeaturesIO {
     
     /**
-     * Export a Set of features to file. This set should originate from a
-     * sorted HashMap, because the idea of feature ranking is that order is
-     * important. In general, the exportFeaturesToFile method should be used
-     * that uses a list of features.
-     * @param features (Ordered) set of features to write to file with their IDs
-     * @param filename The filename of the output
-     */
-    public static void exportFeaturesToFile(Set<Object> features, 
-            String filename) {
-        System.out.println("Exporting features to file " + filename);
-        try {
-            PrintWriter file = new PrintWriter(new FileWriter(filename));
-            int index = 0;
-            for (Object feature : features) {
-                file.println(index++ + "\t" + feature);
-            }
-            file.close();
-        }
-        catch (IOException e) {
-            System.err.println("Error writing selected features to file: " 
-                    + e.getMessage());
-        }
-    }
-    
-    /**
      * Export a List of features to file.
      * @param features (Ordered) set of features to write to file with their IDs
      * @param filename The filename of the output
