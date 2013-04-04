@@ -27,10 +27,10 @@ public class FeatureExample {
                 "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid";
                 
 
-//        /**
-//         * Chi2 example
-//         */
-//        
+        /**
+         * Chi2 example
+         */
+        
 //        ChiSquareFeatureRanker chi2 = new ChiSquareFeatureRanker(inputfile, trainingParser, 
 //                medoidfile, medoidParser);
 //        chi2.process(outputfile + ".chi2");
@@ -52,6 +52,14 @@ public class FeatureExample {
 //        loglike.process(outputfile + ".loglike");
 //        
 //        /**
+//         * Information Gain example
+//         */
+//        
+//        InformationGainFeatureRanker ig = new InformationGainFeatureRanker(
+//                inputfile, trainingParser, medoidfile, medoidParser);
+//        ig.process(outputfile + ".ig");
+//        
+//        /**
 //         * Most Frequently Used (MFU) example
 //         */
 //        MostFrequentlyUsedFeatureRanker mfu = new MostFrequentlyUsedFeatureRanker(
@@ -64,7 +72,5 @@ public class FeatureExample {
 //        
 //        GeoSpreadFeatureRanker gsf = new GeoSpreadFeatureRanker();
 //        gsf.process(inputfile, trainingParser, -1, outputfile + ".geo");
-
-        
     }
 }
