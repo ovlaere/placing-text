@@ -58,6 +58,14 @@ public class ClassMapper {
     private List<Point> medoids;
     
     /**
+     * @return The List of Points that represents the medoids used for
+     * clustering.
+     */
+    public List<Point> getMedoids() {
+        return this.medoids;
+    }
+    
+    /**
      * @return the list of known classes
      */
     public List<GeoClass> getClasses() {
