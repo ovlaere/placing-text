@@ -1,6 +1,5 @@
 package be.ugent.intec.ibcn.geo.common.io.parsers;
 
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItemHome;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;

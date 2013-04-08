@@ -133,19 +133,19 @@ public class NaiveBayes {
      */
     public void classify() {
         // Load the test data
-        System.out.println("Loading test from " + parameters.testFile);
+        System.out.println("Loading test from " + parameters.getTestFile());
         DataLoading dl = new DataLoading();
-        this.test_data = dl.loadDataFromFile(parameters.testFile, 
-                parameters.testParser, parameters.test_limit, parameters.features);
+        this.test_data = dl.loadDataFromFile(parameters.getTestFile(), 
+                parameters.getTestParser(), parameters.getTestLimit(), parameters.features);
 
         
         int fileIndex = 0;
-        int totalKnownClasses = parameters.classmapper.size();
+        int totalKnownClasses = parameters.getClassMapper().size();
         // Depending on the batch size, do the batches
         for (int begin = 0; begin < totalKnownClasses; 
                 begin += this.naive_bayes_batch_size) {
             fileIndex = begin / this.naive_bayes_batch_size;
-            String itermediateFile = parameters.nbPredictionsFile + "." + fileIndex;
+            String itermediateFile = parameters.getOutputFile() + "." + fileIndex;
             // Check if tmp file exists, otherwise resume
             if (!(new File(itermediateFile)).exists()) {
                 // Init the internal NB
@@ -161,7 +161,7 @@ public class NaiveBayes {
         // Gather results from the different batches
         NaiveBayesResults [] results = new NaiveBayesResults[fileIndex+1];
         for (int index = 0; index <= fileIndex; index++) {
-            String file = parameters.nbPredictionsFile + "." + index;
+            String file = parameters.getOutputFile() + "." + index;
             results[index] = new NaiveBayesResults(file);
         }
         // Prepare the merged results
@@ -200,10 +200,10 @@ public class NaiveBayes {
             throw new RuntimeException("Final Naive Bayes results"
                     + "have unexpected size. This should not happen!?");
         // Write the NB predictions to file
-        merged_results.writeNaiveBayesResultsToFile(parameters.nbPredictionsFile);
+        merged_results.writeNaiveBayesResultsToFile(parameters.getOutputFile());
         // Remove the temp files
         for (int index = 0; index <= fileIndex; index++)
-            new File(parameters.nbPredictionsFile + "." + index).delete();
+            new File(parameters.getOutputFile() + "." + index).delete();
         // At this point, for all of the test items, there is an entry on file
         // using the format:
         // ID ClassID Score #Features (used for classification).
@@ -253,7 +253,7 @@ public class NaiveBayes {
          */
         public void trainMultinomial(int begin, int end) {
             System.out.println("== Init multinomial Naive Bayes model [ " + 
-                    begin+" - "+end+" | " + parameters.classmapper.size() + 
+                    begin+" - "+end+" | " + parameters.getClassMapper().size() + 
                     " ]. ==");
             long t1 = System.currentTimeMillis();
             // +1 row = overall tag count
@@ -268,17 +268,17 @@ public class NaiveBayes {
             System.out.println(" [OK. "+(t2-t1)+" ms.]");
             // Get the parser
             LineParserDataItem parser = (LineParserDataItem)
-                    Util.getParser(parameters.trainingParser);
+                    Util.getParser(parameters.getTrainingParser());
             // Set the features for parsing the input
             parser.setFeatures(parameters.features);
             try {
                 // Set up the input
-                BufferedReader in = new BufferedReader(new FileReader(parameters.trainingFile));
+                BufferedReader in = new BufferedReader(new FileReader(parameters.getTrainingFile()));
                 // Fetch the number of lines to process
-                int lines = FileIO.getNumberOfLines(parameters.trainingFile);
+                int lines = FileIO.getNumberOfLines(parameters.getTrainingFile());
                 // Determine the number of lines to process in case a limit was set
-                if (parameters.training_limit > 0 && parameters.training_limit < lines) {
-                    lines = parameters.training_limit;
+                if (parameters.getTrainingLimit() > 0 && parameters.getTrainingLimit() < lines) {
+                    lines = parameters.getTrainingLimit();
                 }
                 // Set up the input lines
                 String line = in.readLine();
@@ -290,7 +290,7 @@ public class NaiveBayes {
                     // Sanity check
                     if (item != null) {
                         // On the fly assign to a medoid
-                        int classId = parameters.classmapper.findClass(item).getId();
+                        int classId = parameters.getClassMapper().findClass(item).getId();
                         // If the class is within the current focus zone for this batch
                         if (classId >= begin && classId < end)
                             // Increment the prior counter for max likelihood
@@ -655,7 +655,7 @@ public class NaiveBayes {
                         // Check if we have this info
                         if (home != null) {
                             // Get the medoid for this class under consideration
-                            Point center = parameters.classmapper.getMedoids().get(classId);
+                            Point center = parameters.getClassMapper().getMedoids().get(classId);
                             // Log score the prior using the info obtained
                             prior = Math.log(Math.pow(1. / 
                                     (center.distance(itemH.getHomeLocation()) + 0.001),

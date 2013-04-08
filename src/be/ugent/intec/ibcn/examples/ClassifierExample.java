@@ -27,11 +27,11 @@ public class ClassifierExample {
         cp.setMedoidFile("medoids.2500");
         cp.setMedoidParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid");
         // Set test file and parser
-        cp.setTestFile("mediaeval2012");
+        cp.setTestFile("mediaeval2011plus");
         cp.setTestParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTestItem");
 //        cp.setTestParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTestItemHome");
         // Set the output file
-        cp.setOutputFile("nbPredictions.2012.nohome");
+        cp.setOutputFile("nbPredictions.2011.nohome");
         // Set feature ranking to use
         cp.setFeatureFile("features.geo");
         // Set class and feature count

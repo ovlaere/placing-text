@@ -1,69 +1,16 @@
 package be.ugent.intec.ibcn.geo.classifier;
 
-import be.ugent.intec.ibcn.geo.common.ClassMapper;
-import be.ugent.intec.ibcn.geo.common.datatypes.Point;
+import be.ugent.intec.ibcn.geo.common.AbstractParameters;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
-import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Extend the common parameters with parameters that are specific to the 
+ * classification process.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
-public class ClassifierParameters {
-
-    /**
-     * The filename of the training file for classification.
-     */
-    protected String trainingFile;
-
-    /**
-     * Set the filename of the training file for classification.
-     * @param trainingFile 
-     */
-    public void setTrainingFile(String trainingFile) {
-        this.trainingFile = trainingFile;
-    }
-    
-    /**
-     * The package and classname of the parser to use for the training file.
-     */
-    protected String trainingParser;
-
-    /**
-     * Set the package and classname of the parser to use for the training file.
-     * @param trainingParser 
-     */
-    public void setTrainingParser(String trainingParser) {
-        this.trainingParser = trainingParser;
-    }
-    
-    /**
-     * The filename of the file containing the medoids for classification.
-     */
-    protected String medoidFile;
-    
-    /**
-     * Set the filename of the file containing the medoids for classification.
-     * @param medoidFile 
-     */
-    public void setMedoidFile(String medoidFile) {
-        this.medoidFile = medoidFile;
-    }
-
-    /**
-     * The package and classname of the parser to use for the medoid file.
-     */
-    protected String medoidParser;
-
-    /**
-     * Set the package and classname of the parser to use for the medoid file.
-     * @param medoidParser 
-     */
-    public void setMedoidParser(String medoidParser) {
-        this.medoidParser = medoidParser;
-    }
+public class ClassifierParameters extends AbstractParameters {
 
     /**
      * The filename of the file containing the features for classification.
@@ -78,46 +25,6 @@ public class ClassifierParameters {
         this.featureFile = featureFile;
     }
 
-    /**
-     * The filename of the file containing the test items for classification.
-     */
-    protected String testFile;
-    
-    /**
-     * Set the filename of the file containing the test items for classification.
-     * @param testFile 
-     */
-    public void setTestFile(String testFile) {
-        this.testFile = testFile;
-    }
-    
-    /**
-     * The package and classname of the parser to use for the test file.
-     */
-    protected String testParser;
-    
-    /**
-     * Set the package and classname of the parser to use for the test file.
-     * @param testParser 
-     */
-    public void setTestParser(String testParser) {
-        this.testParser = testParser;
-    }
-    
-    /**
-     * The filename of the file that will contain, in order, the class 
-     * predictions for the test items.
-     */
-    protected String nbPredictionsFile;
-    
-    /**
-     * Set the filename of the file that will contain, in order, the class 
-     * predictions for the test items.
-     */
-    public void setOutputFile(String nbPredictionsFile) {
-        this.nbPredictionsFile = nbPredictionsFile;
-    }
-    
     /**
      * The number of classes to use for classification.
      */
@@ -145,41 +52,6 @@ public class ClassifierParameters {
     public void setFeatureCount(int featureCount) {
         this.featureCount = featureCount;
     }
-    
-    /**
-     * Optionally, set a limit on the amount of training data to use. -1 means
-     * all training data, otherwise the first 'training_limit' lines.
-     */
-    protected int training_limit = -1;
-
-    /**
-     * Set a limit on the amount of training data to use. -1 means
-     * all training data, otherwise the first 'training_limit' lines.
-     */
-    public void setTraining_limit(int training_limit) {
-        this.training_limit = training_limit;
-    }
-    
-    /**
-     * Optionally, set a limit on the amount of test data to use. -1 means
-     * all test data, otherwise the first 'test_limit' lines.
-     */
-    protected int test_limit = -1;
-    
-    /**
-     * Set a limit on the amount of test data to use. -1 means
-     * all test data, otherwise the first 'test_limit' lines.
-     * @param test_limit 
-     */
-    public void setTest_limit(int test_limit) {
-        this.test_limit = test_limit;
-    }
-
-    /**
-     * Classmapper object for on the fly association of training items
-     * with the medoids.
-     */
-    protected ClassMapper classmapper;
     
     /**
      * Map holding the features in use for classification.
@@ -260,31 +132,18 @@ public class ClassifierParameters {
      * Initialize the parameters.
      * This is necessary before classification can be started!
      */
+    @Override
     public void init() {
-        // Check necessary parameters
+        // Call the super method for init.
+        super.init();
         if (trainingFile == null)
             throw new RuntimeException("Training file is not set for classification.");
         
         if (trainingParser == null)
             throw new RuntimeException("Parser class for training file is not set for classification.");
         
-        if (medoidFile == null)
-            throw new RuntimeException("Medoid file is not set for classification.");
-        
-        if (medoidParser == null)
-            throw new RuntimeException("Parser class for medoid file is not set for classification.");
-        
         if (featureFile == null)
             throw new RuntimeException("Feature file is not set for classification.");
-        
-        if (testFile == null)
-            throw new RuntimeException("Test file is not set for classification.");
-        
-        if (testParser == null)
-            throw new RuntimeException("Parser class for test file is not set for classification.");
-        
-        if (nbPredictionsFile == null)
-            throw new RuntimeException("Output file is not set for classification.");
         
         if (classCount < 0)
             throw new RuntimeException("Number of classes is not set for classification.");
@@ -313,11 +172,6 @@ public class ClassifierParameters {
                     throw new RuntimeException("K-value for home prior is not set.");
                 break;
         }
-        
-        // Load the medoids
-        List<Point> medoids = FileIO.loadMedoids(medoidFile, medoidParser);
-        this.classmapper = new ClassMapper(medoids);
-        
         // Load the features
         this.features = FeaturesIO.loadFeaturesFromFile(featureFile, featureCount);
     }
