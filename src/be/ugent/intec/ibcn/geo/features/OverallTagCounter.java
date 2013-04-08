@@ -6,8 +6,10 @@ import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
 import java.util.*;
 import java.util.concurrent.*;
 
-
-// TODO Add comment
+/**
+ * TODO Add comment
+ * @author Olivier Van Laere <oliviervanlaere@gmail.com>
+ */
 public class OverallTagCounter {
 
     private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();

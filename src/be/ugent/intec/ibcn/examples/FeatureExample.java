@@ -3,7 +3,13 @@ package be.ugent.intec.ibcn.examples;
 import be.ugent.intec.ibcn.geo.features.*;
 
 /**
- * TODO Add comment
+ * This class provides a simple main method that illustrates the use of the
+ * different feature ranking algorithms. The output of the algorithms
+ * are a ranking of the existing features in the training file, and should be
+ * in a file like
+ *  <rank> <feature>
+ * This ranking is then used by the classifier.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class FeatureExample {
