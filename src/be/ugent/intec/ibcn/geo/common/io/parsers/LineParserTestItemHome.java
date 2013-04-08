@@ -1,8 +1,10 @@
 package be.ugent.intec.ibcn.geo.common.io.parsers;
 
+import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItemHome;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
+import be.ugent.intec.ibcn.geo.common.interfaces.LineParserDataItem;
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParserDataItemHome;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,19 +56,23 @@ public class LineParserTestItemHome extends AbstractLineParserDataItem
             // Split the tags
             String [] data = null;
             if (values.length >= 5)
-                pattern_space.split(values[4]);
+                data = pattern_space.split(values[4]);
             
             // Prevent empty tags
             if (data == null || (data.length == 1 && data[0].equals("")))
                 data = new String[0];
-
-            // Prepare a List of selected features, by ID
-            List<Integer> newdata = new ArrayList<Integer>();
-            for (String s : data)
-                if (features.containsKey(s))
-                    newdata.add(features.get(s));
-            // Get the result ready
-            item = new DataItemHome(id, lat, lon, newdata.toArray(new Integer[0]));
+            // In case of no feature selection
+            if (features == null)
+                item = new DataItemHome(id, lat, lon, data);
+            else {
+                // Prepare a List of selected features, by ID
+                List<Integer> newdata = new ArrayList<Integer>();
+                for (String s : data)
+                    if (features.containsKey(s))
+                        newdata.add(features.get(s));
+                // Get the result ready
+                item = new DataItemHome(id, lat, lon, newdata.toArray(new Integer[0]));
+            }
             
             // Fetch lat/lon
             if (values.length >= 8 &&
