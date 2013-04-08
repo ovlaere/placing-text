@@ -4,7 +4,7 @@ import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserDataItem;
+import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -178,7 +178,7 @@ public class GeoSpreadFeatureRanker {
         // Publish the batch limit value
         System.out.println("BATCH LIMIT " + batch_limit);
         // Instantiate the parser
-        LineParserDataItem parser = (LineParserDataItem)Util.getParser(lineparserClassName);
+        AbstractLineParserDataItem parser = (AbstractLineParserDataItem)Util.getParser(lineparserClassName);
         // Prepare a map for the tags and their scores
         Map<Object, GeoScore> spread_map = new HashMap<Object, GeoScore>();
         // Prepare a list of batches to process later on, if we would need to

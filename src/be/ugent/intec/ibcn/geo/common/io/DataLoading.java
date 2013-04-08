@@ -1,7 +1,7 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserDataItem;
+import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 import be.ugent.intec.ibcn.geo.common.Util;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -164,7 +164,7 @@ public class DataLoading {
         /**
          * The parser used to parse the input.
          */
-        private LineParserDataItem parser;
+        private AbstractLineParserDataItem parser;
 
         /**
          * @return the number of lines processed by this Runnable.
@@ -194,7 +194,7 @@ public class DataLoading {
             this.begin = begin;
             this.end = end;
             this.filename = filename;
-            this.parser = (LineParserDataItem)Util.getParser(lineparser);
+            this.parser = (AbstractLineParserDataItem)Util.getParser(lineparser);
             this.parser.setFeatures(features);
             // First line of file should contain the number of lines in the file
             if (this.begin == 0)
