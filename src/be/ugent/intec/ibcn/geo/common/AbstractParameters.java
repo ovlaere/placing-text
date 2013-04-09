@@ -134,22 +134,22 @@ public abstract class AbstractParameters {
      * The filename of the file that will contain, in order, the class 
      * predictions for the test items.
      */
-    protected String nbPredictionsFile;
+    protected String classificationFile;
     
     /**
      * Set the filename of the file that will contain, in order, the class 
      * predictions for the test items.
      */
-    public void setOutputFile(String nbPredictionsFile) {
-        this.nbPredictionsFile = nbPredictionsFile;
+    public void setClassificationFile(String classificationFile) {
+        this.classificationFile = classificationFile;
     }
     
     /**
      * @return the filename of the file that will contain, in order, the class 
      * predictions for the test items.
      */
-    public String getOutputFile() {
-        return this.nbPredictionsFile;
+    public String getClassificationFile() {
+        return this.classificationFile;
     }
     
     /**
@@ -227,7 +227,7 @@ public abstract class AbstractParameters {
         if (testParser == null)
             throw new RuntimeException("Parser class for test file is not set for classification.");
         
-        if (nbPredictionsFile == null)
+        if (classificationFile == null)
             throw new RuntimeException("Output file is not set for classification.");
         
         // Load the medoids

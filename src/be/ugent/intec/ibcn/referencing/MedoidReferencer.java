@@ -32,7 +32,7 @@ public class MedoidReferencer extends AbstractReferencer{
                 parameters.getTestParser(), parameters.getTestLimit(), null);
         
         NaiveBayesResults classifier_output = 
-                new NaiveBayesResults(parameters.getOutputFile());
+                new NaiveBayesResults(parameters.getClassificationFile());
     
         Map<Integer, Point> predictions = new TreeMap<Integer, Point>();
         

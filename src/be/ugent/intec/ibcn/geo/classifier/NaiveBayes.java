@@ -145,7 +145,7 @@ public class NaiveBayes {
         for (int begin = 0; begin < totalKnownClasses; 
                 begin += this.naive_bayes_batch_size) {
             fileIndex = begin / this.naive_bayes_batch_size;
-            String itermediateFile = parameters.getOutputFile() + "." + fileIndex;
+            String itermediateFile = parameters.getClassificationFile() + "." + fileIndex;
             // Check if tmp file exists, otherwise resume
             if (!(new File(itermediateFile)).exists()) {
                 // Init the internal NB
@@ -161,7 +161,7 @@ public class NaiveBayes {
         // Gather results from the different batches
         NaiveBayesResults [] results = new NaiveBayesResults[fileIndex+1];
         for (int index = 0; index <= fileIndex; index++) {
-            String file = parameters.getOutputFile() + "." + index;
+            String file = parameters.getClassificationFile() + "." + index;
             results[index] = new NaiveBayesResults(file);
         }
         // Prepare the merged results
@@ -200,10 +200,10 @@ public class NaiveBayes {
             throw new RuntimeException("Final Naive Bayes results"
                     + "have unexpected size. This should not happen!?");
         // Write the NB predictions to file
-        merged_results.writeNaiveBayesResultsToFile(parameters.getOutputFile());
+        merged_results.writeNaiveBayesResultsToFile(parameters.getClassificationFile());
         // Remove the temp files
         for (int index = 0; index <= fileIndex; index++)
-            new File(parameters.getOutputFile() + "." + index).delete();
+            new File(parameters.getClassificationFile() + "." + index).delete();
         // At this point, for all of the test items, there is an entry on file
         // using the format:
         // ID ClassID Score #Features (used for classification).

@@ -1,5 +1,6 @@
 package be.ugent.intec.ibcn.analyzer;
 
+import be.ugent.intec.ibcn.geo.common.AbstractParameters;
 import be.ugent.intec.ibcn.geo.common.ClassMapper;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
@@ -11,6 +12,18 @@ import java.util.List;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class AnalyzerParameters extends ReferencingParameters{
+    
+    public AnalyzerParameters() {
+        super();
+    }
+    
+    public AnalyzerParameters(AbstractParameters parameters) {
+        super();
+        this.medoidFile = parameters.getMedoidFile();
+        this.medoidParser = parameters.getMedoidParser();
+        this.testFile = parameters.getTestFile();
+        this.testParser = parameters.getTestParser();
+    }
     
     /**
      * Initialize the parameters.
