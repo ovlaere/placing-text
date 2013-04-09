@@ -16,18 +16,14 @@ public class FeatureExample {
 
     public static void main(String[] args) {
         // Provide the full path and filename of your training data
-        String inputfile = "<your file here>";
+        String inputfile = "<training_file_here>";
         // Provide the full path and filename for the feature ranking
-        String outputfile = "<your file here>";
+        String outputfile = "<feature_output_here>";
         // Provide the full path and filename for the medoid file
-        String medoidfile = "<your file here>";
-        
-        inputfile = "training";
-        outputfile = "features";
-        medoidfile = "medoids.2500";
+        String medoidfile = "<clustering_input_here>";
         
         String trainingParser = 
-                "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTrainingDefault";
+                "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTrainingItem";
         
         String medoidParser = 
                 "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid";
