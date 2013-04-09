@@ -1,10 +1,8 @@
 package be.ugent.intec.ibcn.examples;
 
 import be.ugent.intec.ibcn.geo.clustering.*;
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
-import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 
 /**
  * This class provides a mini-howto on how to run the clustering algorithms.
@@ -24,12 +22,12 @@ public class ClusteringExample {
         ClusteringParameters cp = new ClusteringParameters();
         // But we set out own input parser
         cp.setLineParserClassNameForInput(
-                "be.ugent.intec.ibcn.examples.clustering.MyClusterInputParser");
+                "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserClusterPoint");
         
         // Provide the full path and filename of your training data
-        String inputfile = "<your file here>";
+        String inputfile = "<training_file_here>";
         // Provide the full path and filename for the output
-        String outputfile = "<your file here>";
+        String outputfile = "<clustering_output_here>";
         
         // Prepare the ClusteringIO
         ClusteringIO cio = new ClusteringIO();
@@ -49,64 +47,16 @@ public class ClusteringExample {
          * Example of GridClustering with 1 degree latitude and 1 degree longitude
          */
         
-        AbstractClustering clusteringGrid = new GridClustering(cp, data, 1, 1);
-        clusteringGrid.cluster(outputfile + ".grid");
+//        AbstractClustering clusteringGrid = new GridClustering(cp, data, 1, 1);
+//        clusteringGrid.cluster(outputfile + ".grid");
         
         /**
          * Example of PamClustering. This one need special PamParameters.
          */
-        PamParameters pp = new PamParameters();
-        // Init a Pam with k = 2500
-        int k = 2500;
-        AbstractClustering clusteringPam = new PamClustering(pp, data, k);
-        clusteringPam.cluster(outputfile + ".pam");
-    }
-    
-    /**
-     * This class provides a dummy implementation of LineParserPoint.
-     * 
-     * My sample file format is ID,...,lat,lon,...
-     * 
-     * @author Olivier Van Laere <oliviervanlaere@gmail.com>
-     */
-    private class MyClusterInputParser extends LineParserPoint {
-
-        /**
-        * Constructor.
-        */
-        public MyClusterInputParser() {
-            super();
-        }
-
-        /**
-        * Implementation of parse.
-        */
-        @Override
-        public DataItem parse(String line) {
-            // Prepare an empty DataItem.
-            DataItem item = null;
-            try {
-                // Split the line
-                String [] values = pattern_comma.split(line.toLowerCase());
-                // Get the id from the first item
-                int id = Integer.parseInt(values[0]);
-                // Parse latitude from index 2
-                double lat = Double.parseDouble(values[2]);
-                // Parse latitude from index 3
-                double lon = Double.parseDouble(values[3]);
-                // Instantiate the DataItem
-                item = new DataItem(id, lat, lon, null);
-            }
-            // In case a parse error occurs, ignore the error but mark this error.
-            // At the end of the data loading, this error count will be presented
-            // and provided feedback about the errors during parsing. Error items
-            // will not be instantiated.
-            catch (Exception e) {
-                this.errors++;
-            }
-            // Keep track of a processed count
-            this.processed++;
-            return item;
-        }
+//        PamParameters pp = new PamParameters();
+//        // Init a Pam with k = 2500
+//        int k = 2500;
+//        AbstractClustering clusteringPam = new PamClustering(pp, data, k);
+//        clusteringPam.cluster(outputfile + ".pam");
     }
 }
