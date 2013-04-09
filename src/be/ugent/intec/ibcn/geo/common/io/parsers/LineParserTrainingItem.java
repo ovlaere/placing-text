@@ -49,17 +49,22 @@ public class LineParserTrainingItem extends AbstractLineParserDataItem{
             if (data.length == 1 && data[0].equals(""))
                 data = new String[0];
 
-            // Prepare a List of selected features, by ID
-            List<Integer> newdata = new ArrayList<Integer>();
-            for (String s : data)
-                if (features.containsKey(s))
-                    newdata.add(features.get(s));
-            // If there are tags
-            if (newdata.size() > 0) {
-                item = new DataItem(id, lat, lon, newdata.toArray(new Integer[0]));
+            // In case of no feature selection
+            if (features == null)
+                item = new DataItem(id, lat, lon, data);
+            else {            
+                // Prepare a List of selected features, by ID
+                List<Integer> newdata = new ArrayList<Integer>();
+                for (String s : data)
+                    if (features.containsKey(s))
+                        newdata.add(features.get(s));
+                // If there are tags
+                if (newdata.size() > 0) {
+                    item = new DataItem(id, lat, lon, newdata.toArray(new Integer[0]));
+                }
             }
             // Sanity check
-            if (item.getData().length == 0)
+            if (item != null && item.getData().length == 0)
                 item = null;
         }
         catch (Exception e) {
