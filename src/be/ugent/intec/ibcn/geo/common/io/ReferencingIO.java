@@ -23,7 +23,8 @@ public class ReferencingIO {
                             predictedLocation.getLatitude() + " " + 
                             predictedLocation.getLongitude());
                 else {
-                    throw new RuntimeException("This should not happen!? EMPTY PREDICTION" + testId);
+                    throw new RuntimeException("This should not happen!? "
+                            + "EMPTY PREDICTION" + testId);
                 }
             }
             out.close();
