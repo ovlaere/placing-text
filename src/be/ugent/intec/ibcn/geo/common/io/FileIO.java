@@ -99,42 +99,4 @@ public class FileIO {
         if (!f.delete())
             System.err.println("Failed to delete file: " + f);
     }
-    
-    /**
-     * Load the similarity data from file.
-     * @param filename Specific index to load
-     * @param lineparser Parser class to use to parse the input data
-     * @param filter Set of items to filter agains
-     * @return An array of DataItems to use for similarity search
-     */
-    public static DataItem[] loadSimilarityIndex(String filename, 
-            String lineparser, Set<String> filter) {
-        // Prepare the result
-        DataItem[] data = null;
-        try {
-            // Fetch the number of lines to process
-            int lines = getNumberOfLines(filename);
-            // Init the training items to load
-            data = new DataItem[lines];
-            // Set up the parser
-            LineParserDataItemSimilarity parser = (LineParserDataItemSimilarity)
-                    Util.getParser(lineparser);
-            // Set the filter terms
-            parser.setFilter(filter);
-            // Open the input
-            BufferedReader in = new BufferedReader(new FileReader(filename));
-            // Read the input
-            String line = in.readLine();
-            int id = 0;
-            while (line != null) {
-                data[id++] = parser.parse(line);
-                line = in.readLine();
-            }
-            // Close the input
-            in.close();
-        } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
-        }
-        return data;
-    }
 }
