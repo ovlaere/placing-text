@@ -1,10 +1,7 @@
 package be.ugent.intec.ibcn.geo.classifier;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * This class serves the results of the classification step as an object.
@@ -36,6 +33,14 @@ public class NaiveBayesResults {
      */
     public void putPrediction(int id, int classId) {
         this.predictions.put(id, classId);
+    }
+    
+    /**
+     * @return a Collection of the classIDs that are used in the
+     * predictions of the classifier.
+     */
+    public Collection<Integer> getUsedClasses() {
+        return this.predictions.values();
     }
     
     /**
