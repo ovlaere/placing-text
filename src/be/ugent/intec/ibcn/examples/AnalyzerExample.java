@@ -15,11 +15,13 @@ public class AnalyzerExample {
         // Prepare the classifier parameters
         AnalyzerParameters ap = new AnalyzerParameters();
         // Set medoid file and parser
-        ap.setMedoidFile("medoids.2500");
+        ap.setMedoidFile("<clustering_input_here>");
         ap.setMedoidParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid");
         // Set test file and parser
-        ap.setTestFile("mediaeval2012");
+        ap.setTestFile("<test_file_here>");
         ap.setTestParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTestItem");
+        // Set the classification file
+        ap.setClassificationFile("<classification_output_file_here>");
         // Init the parameters
         ap.init();
         
@@ -29,7 +31,6 @@ public class AnalyzerExample {
         AbstractAnalyzer analyzer = new DistanceThresholdAnalyzer(ap, 
                 new double[]{0.001, 0.01, 0.1, 1, 5, 10, 50, 100, 1000, 10000, 40000});
         // Run referencing - output will go to file
-        analyzer.run("predictions.2012.nohome");
-        analyzer.run("predictions.2012.home");
+        analyzer.run("<location_prediction_output_file_here>");
     }
 }

@@ -21,19 +21,19 @@ public class ClassifierExample {
         // Prepare the classifier parameters
         ClassifierParameters cp = new ClassifierParameters();
         // Set training file and parser
-        cp.setTrainingFile("training");
+        cp.setTrainingFile("<training_file_here>");
         cp.setTrainingParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTrainingItem");
         // Set medoid file and parser
-        cp.setMedoidFile("medoids.2500");
+        cp.setMedoidFile("<clustering_input_here>");
         cp.setMedoidParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid");
         // Set test file and parser
-        cp.setTestFile("mediaeval2011plus");
+        cp.setTestFile("<test_file_here>");
         cp.setTestParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTestItem");
 //        cp.setTestParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTestItemHome");
         // Set the output file
-        cp.setOutputFile("nbPredictions.2011.nohome");
+        cp.setClassificationFile("<classification_output_file_here>");
         // Set feature ranking to use
-        cp.setFeatureFile("features.geo");
+        cp.setFeatureFile("<feature_input_here>");
         // Set class and feature count
         cp.setClassCount(2500);
         cp.setFeatureCount(175000);
