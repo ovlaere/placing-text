@@ -3,11 +3,16 @@ package be.ugent.intec.ibcn.geo.common.io;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid;
 import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.interfaces.LineParserDataItemSimilarity;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class provides the necessary IO methods to read data from file.
@@ -80,5 +85,56 @@ public class FileIO {
         }
         System.out.println("Loading medoids from " + filename + ". Loaded medoids: " + medoids.size());
         return medoids;
+    }
+    
+    /**
+     * Recursive delete of files and folders.
+     * @param f The file or folder to (recursively) delete.
+     */
+    public static void delete(File f) {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        if (!f.delete())
+            System.err.println("Failed to delete file: " + f);
+    }
+    
+    /**
+     * Load the similarity data from file.
+     * @param filename Specific index to load
+     * @param lineparser Parser class to use to parse the input data
+     * @param filter Set of items to filter agains
+     * @return An array of DataItems to use for similarity search
+     */
+    public static DataItem[] loadSimilarityIndex(String filename, 
+            String lineparser, Set<String> filter) {
+        // Prepare the result
+        DataItem[] data = null;
+        try {
+            // Fetch the number of lines to process
+            int lines = getNumberOfLines(filename);
+            // Init the training items to load
+            data = new DataItem[lines];
+            // Set up the parser
+            LineParserDataItemSimilarity parser = (LineParserDataItemSimilarity)
+                    Util.getParser(lineparser);
+            // Set the filter terms
+            parser.setFilter(filter);
+            // Open the input
+            BufferedReader in = new BufferedReader(new FileReader(filename));
+            // Read the input
+            String line = in.readLine();
+            int id = 0;
+            while (line != null) {
+                data[id++] = parser.parse(line);
+                line = in.readLine();
+            }
+            // Close the input
+            in.close();
+        } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+        return data;
     }
 }
