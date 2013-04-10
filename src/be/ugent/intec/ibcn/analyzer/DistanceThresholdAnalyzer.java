@@ -10,7 +10,21 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO Add comment
+ * This class demonstrates how a simple analyzer for location predictions is
+ * written.
+ * 
+ * As an extension of AbstractAnalyzer, the test data is available to this 
+ * class.
+ * 
+ * The DistanceThresholdAnalyzer takes an array of distance thresholds in 
+ * the constructor that are used to evaluate the location predictions.
+ * 
+ * For each prediction for the test data, the distance is calculate to the 
+ * ground truth location, and stored in a list. From this list, the median
+ * error is determined. Also, the distance is checked against the different 
+ * thresholds and counters are used to report the number of items within the
+ * given thresholds.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
@@ -72,7 +86,7 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
                 double latitude = Double.parseDouble(values[1]);
                 double longitude = Double.parseDouble(values[2]);
                 Point predictedLocation = new Point(-1, latitude, longitude);
-                double distance = -1;
+                double distance;
                 // Sanity check
                 if (test_data != null) {
                     DataItem item = test_data[id - 1];
@@ -115,6 +129,11 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
         }
     }
     
+    /**
+     * Result reporting to the console.
+     * @param tmp_distances The list of error distances over all the items
+     * @param filename the filename with the results that is being analyzed
+     */
     protected void results(List<Double> tmp_distances, String filename) {
         // Sort the list of distances
         Collections.sort(tmp_distances);

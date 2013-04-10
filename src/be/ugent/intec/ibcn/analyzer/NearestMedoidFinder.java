@@ -8,8 +8,6 @@ import edu.wlu.cs.levy.CG.KeySizeException;
 import java.util.List;
 
 /**
- * TODO Comment.
- * 
  * This class allows for quick retrieval of the closest class given a certain
  * location.
  * 
@@ -17,8 +15,17 @@ import java.util.List;
  */
 public class NearestMedoidFinder {
 
+    /**
+     * KD-Tree for nearest medoid retrieval.
+     */
     private KDTree<Integer> kd = new KDTree<Integer>(3);
 
+    /**
+     * Get the ID of the nearest neighbour given a certain Point.
+     * @param p Point for which we seek the nearest medoid.
+     * @return the ID of the medoid that is closest to the given Point or -1 if
+     * none could be found.
+     */
     public int getNearestMedoid(Point p) {
         List<Integer> nbrs = null;
         try {
@@ -33,9 +40,10 @@ public class NearestMedoidFinder {
             return -1;
     }
 
-
     /**
      * Constructor.
+     * @param medoids List of Points that represent the medoids that should be
+     * searchable for nearest neighbour.
      */
     public NearestMedoidFinder(List<Point> medoids) {
         int duplicates = 0;
@@ -46,7 +54,6 @@ public class NearestMedoidFinder {
             } catch (KeySizeException ex) {
                 System.err.println("Error: " + ex.getMessage());
             } catch (KeyDuplicateException ex) {
-                //System.err.println("Error: " + ex.getMessage() + " " + key[0] + " " +key[1]);
                 duplicates++;
             }
         }
