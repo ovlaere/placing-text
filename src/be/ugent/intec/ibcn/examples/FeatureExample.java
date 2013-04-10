@@ -1,5 +1,6 @@
 package be.ugent.intec.ibcn.examples;
 
+import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.features.*;
 
 /**
@@ -15,64 +16,63 @@ import be.ugent.intec.ibcn.geo.features.*;
 public class FeatureExample {
 
     public static void main(String[] args) {
-        // Provide the full path and filename of your training data
-        String inputfile = "<training_file_here>";
-        // Provide the full path and filename for the feature ranking
-        String outputfile = "<feature_output_here>";
-        // Provide the full path and filename for the medoid file
-        String medoidfile = "<clustering_input_here>";
         
-        String trainingParser = 
-                "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTrainingItem";
+        // Shorthand for the dir prefix for the filenames
+        String dataDir = "/"; // Your actual dataDir here
         
-        String medoidParser = 
-                "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid";
-                
+        // Provide the full path and filename of the files that will be used
+        String trainingFile = dataDir + "training"; // Your actual training file here
+        String medoidfile = dataDir + "medoids"; // Your actual medoid file here
+        String featureTemplate  = dataDir + "features.@1";
+        
+        // Parser classes
+        String trainingParser = "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTrainingItem";
+        String medoidParser = "be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid";
 
-        /**
-         * Chi2 example
-         */
-        
-//        ChiSquareFeatureRanker chi2 = new ChiSquareFeatureRanker(inputfile, trainingParser, 
+//        /**
+//         * Chi2 example
+//         */
+//        
+//        ChiSquareFeatureRanker chi2 = new ChiSquareFeatureRanker(trainingFile, trainingParser, 
 //                medoidfile, medoidParser);
-//        chi2.process(outputfile + ".chi2");
+//        chi2.process(Util.applyTemplateValues(featureTemplate, new String[]{"chi2"}));
 //
 //        /**
 //         * Max-Chi2 example
 //         */
 //        
 //        MaxChiSquareFeatureRanker maxchi2 = new MaxChiSquareFeatureRanker(
-//                inputfile, trainingParser, medoidfile, medoidParser);
-//        maxchi2.process(outputfile + ".maxchi2");
+//                trainingFile, trainingParser, medoidfile, medoidParser);
+//        maxchi2.process(Util.applyTemplateValues(featureTemplate, new String[]{"maxchi2"}));
 //        
 //        /**
 //         * LogLikelihood example
 //         */
 //        
 //        LogLikelihoodFeatureRanker loglike = new LogLikelihoodFeatureRanker(
-//                inputfile, trainingParser, medoidfile, medoidParser);
-//        loglike.process(outputfile + ".loglike");
+//                trainingFile, trainingParser, medoidfile, medoidParser);
+//        loglike.process(Util.applyTemplateValues(featureTemplate, new String[]{"loglike"}));
 //        
 //        /**
 //         * Information Gain example
 //         */
 //        
 //        InformationGainFeatureRanker ig = new InformationGainFeatureRanker(
-//                inputfile, trainingParser, medoidfile, medoidParser);
-//        ig.process(outputfile + ".ig");
+//                trainingFile, trainingParser, medoidfile, medoidParser);
+//        ig.process(Util.applyTemplateValues(featureTemplate, new String[]{"ig"}));
 //        
 //        /**
 //         * Most Frequently Used (MFU) example
 //         */
 //        MostFrequentlyUsedFeatureRanker mfu = new MostFrequentlyUsedFeatureRanker(
-//                inputfile, trainingParser);
-//        mfu.process(outputfile + ".mostused");
+//                trainingFile, trainingParser);
+//        mfu.process(Util.applyTemplateValues(featureTemplate, new String[]{"mostused"}));
 //        
 //        /**
 //         * Geospread example
 //         */
 //        
 //        GeoSpreadFeatureRanker gsf = new GeoSpreadFeatureRanker();
-//        gsf.process(inputfile, trainingParser, -1, outputfile + ".geo");
+//        gsf.process(trainingFile, trainingParser, -1, Util.applyTemplateValues(featureTemplate, new String[]{"geo"}));
     }
 }

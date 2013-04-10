@@ -44,6 +44,12 @@ import java.util.List;
  *     back to a coarser level, until we run out. Next, the most similar
  *     training item from that area is returned as the location estimate.
  * 
+ * This implementation does not use any visual features at all. Also, the actual
+ * run1 for placing2012 used metadata from for instance the textual home location
+ * of the user of the Flickr photos, description and comment info, while in this
+ * version, a training item without tags is a lost cause, yielding worse results
+ * than our actual submission. 
+ * 
  * If you have signed the data agreement between MediaEval and yourself, you
  * can contact me to obtain the training and test set.
  * 
@@ -69,11 +75,11 @@ public class MediaEval2012PlacingExample {
         int [] dirichletMus = new int []{15000, 12500, 500};
 
         // Shorthand for the dir prefix for the filenames
-        String dataDir = "placing2012/";
+        String dataDir = "/"; // Your actual dataDir here
         
         // Provide the full path and filename of the files that will be used
-        String trainingFile = dataDir + "training";
-        String testFile     = dataDir + "test.2012";
+        String trainingFile = dataDir + "training"; // Your actual training file here
+        String testFile     = dataDir + "test"; // Your actual test file here
         String featureFile  = dataDir + "features.geo";
         String medoidTemplate = dataDir + "medoids.@1";
         String classificationTemplate = dataDir + "classification.@1";
