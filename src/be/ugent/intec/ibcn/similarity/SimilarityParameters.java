@@ -83,6 +83,8 @@ public class SimilarityParameters extends ReferencingParameters {
         this.testFile = parameters.getTestFile();
         this.testParser = parameters.getTestParser();
         this.classificationFile = parameters.getClassificationFile();
+        this.training_limit = parameters.getTrainingLimit();
+        this.test_limit = parameters.getTestLimit();
     }
     
     /**

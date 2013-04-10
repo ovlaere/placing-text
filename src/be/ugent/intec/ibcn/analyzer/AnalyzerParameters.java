@@ -19,11 +19,15 @@ public class AnalyzerParameters extends ReferencingParameters{
     
     public AnalyzerParameters(AbstractParameters parameters) {
         super();
+        this.trainingFile = parameters.getTrainingFile();
+        this.trainingParser = parameters.getTrainingParser();
         this.medoidFile = parameters.getMedoidFile();
         this.medoidParser = parameters.getMedoidParser();
         this.testFile = parameters.getTestFile();
         this.testParser = parameters.getTestParser();
-    }
+        this.classificationFile = parameters.getClassificationFile();
+        this.training_limit = parameters.getTrainingLimit();
+        this.test_limit = parameters.getTestLimit();    }
     
     /**
      * Initialize the parameters.
