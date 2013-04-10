@@ -5,7 +5,10 @@ import be.ugent.intec.ibcn.geo.common.io.FileIO;
 import java.util.List;
 
 /**
- * TODO Add comment
+ * This base class contains the basic parameters for most of the components of
+ * the framework. Components can extend this class to add parameters and methods
+ * while still sharing the most basic parameters.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public abstract class AbstractParameters {
@@ -211,24 +214,24 @@ public abstract class AbstractParameters {
     
     /**
      * Initialize the parameters.
-     * This is necessary before classification can be started!
+     * This is necessary before most of the components can be started!
      */
     public void init() {
         // Check necessary parameters        
         if (medoidFile == null)
-            throw new RuntimeException("Medoid file is not set for classification.");
+            throw new RuntimeException("Medoid file is not set.");
         
         if (medoidParser == null)
-            throw new RuntimeException("Parser class for medoid file is not set for classification.");
+            throw new RuntimeException("Parser class for medoid file is not set.");
         
         if (testFile == null)
-            throw new RuntimeException("Test file is not set for classification.");
+            throw new RuntimeException("Test file is not set.");
         
         if (testParser == null)
-            throw new RuntimeException("Parser class for test file is not set for classification.");
+            throw new RuntimeException("Parser class for test file is not set.");
         
         if (classificationFile == null)
-            throw new RuntimeException("Output file is not set for classification.");
+            throw new RuntimeException("Output file is not set.");
         
         // Load the medoids
         List<Point> medoids = FileIO.loadMedoids(medoidFile, medoidParser);

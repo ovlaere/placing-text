@@ -89,7 +89,7 @@ public class SimilarityParameters extends ReferencingParameters {
     
     /**
      * Initialize the parameters.
-     * This is necessary before classification can be started!
+     * This is necessary before the similarity process can be started!
      */
     @Override
     public void init() {
@@ -132,6 +132,7 @@ public class SimilarityParameters extends ReferencingParameters {
         List<Point> medoids = FileIO.loadMedoids(medoidFile, medoidParser);
         this.classmapper = new ClassMapper(medoids);
         
-        // Features are null, so all data is loaded - if the LineParser implements this
+        // Features are null, so all features are loaded as String 
+        // if the LineParser implements this
     }
 }

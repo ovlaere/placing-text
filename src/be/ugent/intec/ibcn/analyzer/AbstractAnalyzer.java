@@ -6,7 +6,12 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
- * TODO Add comment
+ * Abstract class with the basics for analyzing location predictions.
+ * 
+ * In order to analyze the results, the test data needs to be loaded. Therefore
+ * all extentions of this are automatically provided with the loaded test data.
+ * 
+ * Analyzers should implement the run method, with a filename to analyze.
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */

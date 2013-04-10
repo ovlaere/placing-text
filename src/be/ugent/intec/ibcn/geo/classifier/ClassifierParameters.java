@@ -137,19 +137,19 @@ public class ClassifierParameters extends AbstractParameters {
         // Call the super method for init.
         super.init();
         if (trainingFile == null)
-            throw new RuntimeException("Training file is not set for classification.");
+            throw new RuntimeException("Training file is not set.");
         
         if (trainingParser == null)
-            throw new RuntimeException("Parser class for training file is not set for classification.");
+            throw new RuntimeException("Parser class for training file is not set.");
         
         if (featureFile == null)
-            throw new RuntimeException("Feature file is not set for classification.");
+            throw new RuntimeException("Feature file is not set.");
         
         if (classCount < 0)
-            throw new RuntimeException("Number of classes is not set for classification.");
+            throw new RuntimeException("Number of classes is not set.");
         
         if (featureCount < 0)
-            throw new RuntimeException("Number of features is not set for classification.");
+            throw new RuntimeException("Number of features is not set.");
         // Check necessary smoothing parameters
         switch (smoothingMethod) {
             case -1:
