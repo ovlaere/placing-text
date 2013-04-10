@@ -48,9 +48,10 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
     public DistanceThresholdAnalyzer(AnalyzerParameters parameters, double [] distances) {
         super(parameters);
         this.distances = distances;
-        this.nmf = new NearestMedoidFinder(parameters.getClassMapper().getMedoids());
+        if (parameters.getClassMapper() != null)
+            this.nmf = new NearestMedoidFinder(parameters.getClassMapper().getMedoids());
     }
-
+    
     @Override
     public void run(String filename) {
         // Init the different threshold counters
@@ -89,16 +90,17 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
                             if (predictedClass == actualClass)
                                 classCorrect++;
                         }
-                    }
-                    // Add the distance we found
-                    tmp_distances.add(distance);
-                    // Track the distance in the buckets we have defined
-                    for (int i = 0; i < this.distances.length; i++) {
-                        if (distance <= this.distances[i]) {
-                            counters[i]++;
+                    
+                        // Add the distance we found
+                        tmp_distances.add(distance);
+                        // Track the distance in the buckets we have defined
+                        for (int i = 0; i < this.distances.length; i++) {
+                            if (distance <= this.distances[i]) {
+                                counters[i]++;
+                            }
                         }
+                        processed++;
                     }
-                    processed++;
                 }
                 // Read the next line of the predictions
                 line = in.readLine();
@@ -132,11 +134,14 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
             System.out.print(formatter.format(counters[i] * 100. / processed) + "\t");
         System.out.println(formatter.format(distance));
         System.out.println("");
-        // Report the accuracy at the clustering level
-        System.out.println("Acc "+ parameters.getClassMapper().size() +":\t" + 
-                classCorrect+"\t"+processed+"\t"+ 
-                formatter.format(classCorrect * 100. / processed));
-        System.out.println("");
+        // If there was a need for accuracy on clustering level
+        if (this.nmf != null) {
+            // Report the accuracy at the clustering level
+            System.out.println("Acc "+ parameters.getClassMapper().size() +":\t" + 
+                    classCorrect+"\t"+processed+"\t"+ 
+                    formatter.format(classCorrect * 100. / processed));
+            System.out.println("");
+        }
         // Report the distance stats
         for (int i = 0; i < this.distances.length; i++)
             System.out.println(this.distances[i] + "\t" + formatter.format(counters[i] * 100. / processed) + "\t"+counters[i]+"\t"+processed);
