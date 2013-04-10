@@ -14,14 +14,12 @@ public class AnalyzerExample {
     public static void main(String[] args) {
         // Prepare the classifier parameters
         AnalyzerParameters ap = new AnalyzerParameters();
-        // Set medoid file and parser
+        // Set medoid file and parser - optional
         ap.setMedoidFile("<clustering_input_here>");
         ap.setMedoidParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid");
         // Set test file and parser
         ap.setTestFile("<test_file_here>");
         ap.setTestParser("be.ugent.intec.ibcn.geo.common.io.parsers.LineParserTestItem");
-        // Set the classification file
-        ap.setClassificationFile("<classification_output_file_here>");
         // Init the parameters
         ap.init();
         

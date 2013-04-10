@@ -27,7 +27,8 @@ public class AnalyzerParameters extends ReferencingParameters{
         this.testParser = parameters.getTestParser();
         this.classificationFile = parameters.getClassificationFile();
         this.training_limit = parameters.getTrainingLimit();
-        this.test_limit = parameters.getTestLimit();    }
+        this.test_limit = parameters.getTestLimit();    
+    }
     
     /**
      * Initialize the parameters.
@@ -36,20 +37,16 @@ public class AnalyzerParameters extends ReferencingParameters{
     @Override
     public void init() {
         // Check necessary parameters        
-        if (medoidFile == null)
-            throw new RuntimeException("Medoid file is not set for classification.");
-        
-        if (medoidParser == null)
-            throw new RuntimeException("Parser class for medoid file is not set for classification.");
-        
         if (testFile == null)
             throw new RuntimeException("Test file is not set for classification.");
         
         if (testParser == null)
             throw new RuntimeException("Parser class for test file is not set for classification.");
-        
-        // Load the medoids
-        List<Point> medoids = FileIO.loadMedoids(medoidFile, medoidParser);
-        this.classmapper = new ClassMapper(medoids);
+
+        if (medoidFile != null && medoidParser != null) {
+            // Load the medoids
+            List<Point> medoids = FileIO.loadMedoids(medoidFile, medoidParser);
+            this.classmapper = new ClassMapper(medoids);
+        }
     }
 }
