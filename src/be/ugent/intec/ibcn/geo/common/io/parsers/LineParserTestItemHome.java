@@ -78,7 +78,7 @@ public class LineParserTestItemHome extends AbstractLineParserDataItem
                     values[6].length() > 0 && values[7].length() > 0) {
                 double home_lat = Double.parseDouble(values[6]);
                 double home_lon = Double.parseDouble(values[7]);
-                Point home = new Point(-1, home_lat, home_lat);
+                Point home = new Point(-1, home_lat, home_lon);
                 item.setHomeLocation(home);
             }
         }
