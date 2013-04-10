@@ -1,8 +1,8 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
+import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
-import be.ugent.intec.ibcn.geo.common.Util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
