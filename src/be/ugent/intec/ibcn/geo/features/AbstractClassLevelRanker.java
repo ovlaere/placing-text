@@ -23,7 +23,8 @@ public abstract class AbstractClassLevelRanker {
     /**
      * Number of threads, for multi-threaded processing.
      */
-    protected static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    protected static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
     
     /**
      * Random generator used in shuffling data.
@@ -36,9 +37,9 @@ public abstract class AbstractClassLevelRanker {
     protected int total_photos = 0;
 
     /**
-     * Object containing the overall tag counts.
+     * Object containing the overall feature counts.
      */
-    protected OverallTagCounter otc;
+    protected OverallFeatureCounter otc;
 
     /**
      * ClassMapper used for on the fly clustering association.
@@ -67,12 +68,13 @@ public abstract class AbstractClassLevelRanker {
                 total_photos++;
         
         // Load the medoids
-        List<Point> medoid_points = FileIO.loadMedoids(medoidfile, medoidParser);
+        List<Point> medoid_points = FileIO.loadMedoids(medoidfile, 
+                medoidParser);
         // Init the classmapper
         this.classmapper = new ClassMapper(medoid_points);
         // Attach the actual data - i.e. fully loaded clustering info now
         this.classmapper.attachElements(data);
-        // Now we can init an overall tag counter
-        this.otc = new OverallTagCounter(classmapper, data);
+        // Now we can init an overall feature counter
+        this.otc = new OverallFeatureCounter(classmapper, data);
     }
 }

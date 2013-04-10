@@ -19,14 +19,14 @@ import java.util.concurrent.*;
  * with different smoothing techniques.
  *
  * For details,
- *  @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0100
+ * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0100
  * 
- * This classifier will run through the training data on file, making it scalable
- * to large input files (tested to up to 64 million training items). However,
- * the test data needs to be loaded into memory using the default IO method.
- * This has not been a bottleneck so far, as the training data is mostly in the
- * range of thousands to 100 000 items. In case the test data would grow beyond
- * this range, this should be rewritten.
+ * This classifier will run through the training data on file, making it 
+ * scalable to large input files (tested to up to 64 million training items). 
+ * However, the test data needs to be loaded into memory using the default IO 
+ * method. This has not been a bottleneck so far, as the training data is mostly
+ * in the range of thousands to 100 000 items. In case the test data would grow 
+ * beyond this range, this should be rewritten.
  * 
  * The classifier will work train the model in batches, in case there are too
  * many features to be used or too many classes to be used. The optimal value
@@ -78,35 +78,31 @@ public class NaiveBayes {
     /**
      * Constant containing the number of processors available in the system.
      */
-    private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    private static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
 
     /**
      * Constant defining the maximum likelihood prior.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0110
      */
     public static final int PRIOR_MAX_LIKELIHOOD = 0;
     
     /**
      * Constant defining the uniform prior.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0110
      */
     public static final int PRIOR_UNIFORM = 1;
     
     /**
      * Constant defining the home location prior.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0115
      */
     public static final int PRIOR_HOME = 2;
 
     /**
      * Constant defining Bayesian smoothing using Dirichlet priors.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0125
      */
     public static final int SMOOTHING_DIRICHLET = 10;
     
     /**
      * Constant defining Jelinek-Mercer smoothing.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0125
      */
     public static final int SMOOTHING_JELINEK = 11;
     
@@ -136,7 +132,8 @@ public class NaiveBayes {
         System.out.println("Loading test from " + parameters.getTestFile());
         DataLoading dl = new DataLoading();
         this.test_data = dl.loadDataFromFile(parameters.getTestFile(), 
-                parameters.getTestParser(), parameters.getTestLimit(), parameters.features);
+                parameters.getTestParser(), parameters.getTestLimit(), 
+                parameters.features);
 
         
         int fileIndex = 0;
@@ -145,12 +142,14 @@ public class NaiveBayes {
         for (int begin = 0; begin < totalKnownClasses; 
                 begin += this.naive_bayes_batch_size) {
             fileIndex = begin / this.naive_bayes_batch_size;
-            String itermediateFile = parameters.getClassificationFile() + "." + fileIndex;
+            String itermediateFile = parameters.getClassificationFile() + "." + 
+                    fileIndex;
             // Check if tmp file exists, otherwise resume
             if (!(new File(itermediateFile)).exists()) {
                 // Init the internal NB
                 NaiveBayesInternal nb = new NaiveBayesInternal();
-                // Train the classifier from begin to end - determined by the batch
+                // Train the classifier from begin to end - determined by the 
+                // batch
                 nb.trainMultinomial(begin, 
                         Math.min(begin + this.naive_bayes_batch_size, 
                         totalKnownClasses));
@@ -177,9 +176,10 @@ public class NaiveBayes {
             for (int r = 0; r < results.length; r++) {
                 // Sanity check - bail out if this is violated
                 if (results[r].size() != results[0].size())
-                    throw new RuntimeException("The intermediate Naive Bayes results"
-                            + "differ in size. This should not happen!?");
-                // If the score under consideration is better than the current best
+                    throw new RuntimeException("The intermediate Naive Bayes "
+                        + "results differ in size. This should not happen!?");
+                // If the score under consideration is better than the current 
+                // best
                 if (results[r].getScore(id) > maxScore) {
                     // Replace the best values
                     maxScore = results[r].getScore(id);
@@ -193,14 +193,16 @@ public class NaiveBayes {
             merged_results.putPrediction(id, results[maxR].getPrediction(id) + 
                     (maxR * naive_bayes_batch_size));
             merged_results.putScore(id, results[maxR].getScore(id));
-            merged_results.putFeatureCount(id, results[maxR].getFeatureCount(id));
+            merged_results.putFeatureCount(id, results[maxR].
+                    getFeatureCount(id));
         }
         // Sanity check - bail out if this is violated
         if (merged_results.size() != results[0].size())
             throw new RuntimeException("Final Naive Bayes results"
                     + "have unexpected size. This should not happen!?");
         // Write the NB predictions to file
-        merged_results.writeNaiveBayesResultsToFile(parameters.getClassificationFile());
+        merged_results.writeNaiveBayesResultsToFile(
+                parameters.getClassificationFile());
         // Remove the temp files
         for (int index = 0; index <= fileIndex; index++)
             new File(parameters.getClassificationFile() + "." + index).delete();
@@ -256,7 +258,7 @@ public class NaiveBayes {
                     begin+" - "+end+" | " + parameters.getClassMapper().size() + 
                     " ]. ==");
             long t1 = System.currentTimeMillis();
-            // +1 row = overall tag count
+            // +1 row = overall feature count
             this.rows = end - begin + 1;
             // + 1 column = total class count
             this.columns = parameters.features.size() + 1;
@@ -273,11 +275,15 @@ public class NaiveBayes {
             parser.setFeatures(parameters.features);
             try {
                 // Set up the input
-                BufferedReader in = new BufferedReader(new FileReader(parameters.getTrainingFile()));
+                BufferedReader in = new BufferedReader(
+                        new FileReader(parameters.getTrainingFile()));
                 // Fetch the number of lines to process
-                int lines = FileIO.getNumberOfLines(parameters.getTrainingFile());
-                // Determine the number of lines to process in case a limit was set
-                if (parameters.getTrainingLimit() > 0 && parameters.getTrainingLimit() < lines) {
+                int lines = FileIO.getNumberOfLines(
+                        parameters.getTrainingFile());
+                // Determine the number of lines to process in case a limit was 
+                // set
+                if (parameters.getTrainingLimit() > 0 && 
+                        parameters.getTrainingLimit() < lines) {
                     lines = parameters.getTrainingLimit();
                 }
                 // Set up the input lines
@@ -290,22 +296,25 @@ public class NaiveBayes {
                     // Sanity check
                     if (item != null) {
                         // On the fly assign to a medoid
-                        int classId = parameters.getClassMapper().findClass(item).getId();
-                        // If the class is within the current focus zone for this batch
+                        int classId = parameters.getClassMapper().
+                                findClass(item).getId();
+                        // If the class is within the current focus zone for 
+                        // this batch
                         if (classId >= begin && classId < end)
                             // Increment the prior counter for max likelihood
                             this.priors[classId-begin]++;
-                        // For each of the tags we have
-                        for (Object tag : item.getData()) {
-                            // Again, if the class is within the current focus zone
+                        // For each of the features we have
+                        for (Object feature : item.getData()) {
+                            // Again, if the class is within the current focus 
+                            // zone
                             if (classId >= begin && classId < end) {
                                 // Increment feature for this class
-                                nb_model[classId-begin][(Integer)tag]++;
+                                nb_model[classId-begin][(Integer)feature]++;
                                 // Increment total feature count for this class
                                 this.nb_model[classId-begin][columns-1]++;
                             }
                             // Increment overall feature count for this feature
-                            this.nb_model[rows-1][(Integer)tag]++;
+                            this.nb_model[rows-1][(Integer)feature]++;
                             // Increment overall feature count for all features
                             this.nb_model[rows-1][columns-1]++;
                         }
@@ -348,9 +357,12 @@ public class NaiveBayes {
             while (!executor.isTerminated()) {}
             // Stop the itmer and publish statistics
             long stop = System.currentTimeMillis();
-            System.out.println("Training complete. (" + (stop - start) + " ms.)");
-            System.out.println(" [nb_model] classes  : " + (nb_model.length - 1));
-            System.out.println(" [nb_model] features : " + (nb_model[0].length - 1));        
+            System.out.println("Training complete. (" + 
+                    (stop - start) + " ms.)");
+            System.out.println(" [nb_model] classes  : " + 
+                    (nb_model.length - 1));
+            System.out.println(" [nb_model] features : " + 
+                    (nb_model[0].length - 1));        
         }
 
         /**
@@ -389,22 +401,25 @@ public class NaiveBayes {
                     int totalOccTa = (int)nb_model[rows - 1][t];
 
                     // Calculate the probability
-                    // Default probability in case the tags don't occur -
-                    // This can happen when the feature list is extracted from data
-                    // different than the training data for the classifier
+                    // Default probability in case the features don't occur -
+                    // This can happen when the feature list is extracted from 
+                    // data different than the training data for the classifier
                     double p = 1;
                     if (totalOccTa > 0) {
                         // Switch on the smoothing method
                         switch (parameters.smoothingMethod) {
                             case SMOOTHING_JELINEK:
                                 double lambda = parameters.jelinekLambda;
-                                p = (lambda * ((totalOccTa * 1.) / (totalOccTacc * 1.))) +
-                                ((1. - lambda) * ((occTa * 1.) / (occTacc * 1.)));
+                                p = (lambda * ((totalOccTa * 1.) / 
+                                        (totalOccTacc * 1.))) +
+                                        ((1. - lambda) * 
+                                        ((occTa * 1.) / (occTacc * 1.)));
                                 break;
                             case SMOOTHING_DIRICHLET:
                                 double mu = parameters.dirichletMu;
                                 p = (occTa + mu * ((totalOccTa * 1.) / 
-                                        (totalOccTacc * 1.))) / ((occTacc * 1.) + mu);
+                                    (totalOccTacc * 1.))) / ((occTacc * 1.) + 
+                                        mu);
                                 break;
                         }
                     }
@@ -432,13 +447,15 @@ public class NaiveBayes {
                     length = test_data.length - (i * length);
                 }
                 int end = begin + length;
-                Callable<File> worker = new NaiveBayesEvaluateCallable(begin, end, intermediateFile);
+                Callable<File> worker = new NaiveBayesEvaluateCallable(begin, 
+                        end, intermediateFile);
                 Future<File> submit = executor.submit(worker);
                 list.add(submit);
             }
             // Now retrieve the result and write them to file
             try {
-                PrintWriter results = new PrintWriter(new FileWriter(intermediateFile), true);
+                PrintWriter results = new PrintWriter(
+                        new FileWriter(intermediateFile), true);
                 int results_counter = 0;
                 System.out.println("Merging individual thread result files");
                 long start_merge = System.currentTimeMillis();
@@ -446,12 +463,14 @@ public class NaiveBayes {
                     try {
                         File tmp_file = future.get();
                         System.out.println("Processing " + tmp_file.getName());
-                        BufferedReader input = new BufferedReader(new FileReader(tmp_file));
+                        BufferedReader input = new BufferedReader(
+                                new FileReader(tmp_file));
                         String line = input.readLine();
                         while (line != null) {
                             String [] values = line.split("\t");
-                            // ID PREDICTION SCORE TAGS_USED
-                            results.println(values[0] + "\t" + values[1] + "\t" + values[2] + "\t" + values[3]);
+                            // ID PREDICTION SCORE FEATURES_USED
+                            results.println(values[0] + "\t" + values[1] + "\t" 
+                                    + values[2] + "\t" + values[3]);
                             results_counter++;
                             line = input.readLine();
                         }
@@ -465,10 +484,12 @@ public class NaiveBayes {
                 }
                 results.close();
                 long stop_merge = System.currentTimeMillis();
-                System.out.println("Merge complete ("+(stop_merge-start_merge)+" ms.)");
+                System.out.println("Merge complete ("+(stop_merge-start_merge)
+                        +" ms.)");
                 System.out.println("Lines: " + results_counter);
             } catch (IOException e) {
-                System.err.println("IOException during writing of predictions: " + e.getMessage());
+                System.err.println("IOException during writing of predictions: "
+                        + e.getMessage());
             }
             // This will make the executor accept no new threads
             // and finish all existing threads in the queue
@@ -477,9 +498,12 @@ public class NaiveBayes {
             while (!executor.isTerminated()) {}
             // Stop the itmer and publish statistics
             long stop = System.currentTimeMillis();
-            System.out.println("=============== [NaiveBayes] Results: ===============");
-            System.out.println("Total processing time: " + (stop - start) + " ms.");
-            System.out.println("=====================================================");
+            System.out.println("=============== [NaiveBayes] Results: ======="
+                    + "========");
+            System.out.println("Total processing time: " + (stop - start) + 
+                    " ms.");
+            System.out.println("============================================="
+                    + "========");
         }
 
         /**
@@ -504,35 +528,40 @@ public class NaiveBayes {
 
             /**
              * Constructor.
-             * @param begin the beginning of the data this thread has to process.
+             * @param begin the beginning of the data this thread has to 
+             * process.
              * @param end the end of the data this thread has to process.
-             * @param intermediateFile The filename of the intermediate result of this
-             * Naive Bayes batch.
+             * @param intermediateFile The filename of the intermediate result 
+             * of this Naive Bayes batch.
              */
-            public NaiveBayesEvaluateCallable(int begin, int end, String intermediateFile) {
+            public NaiveBayesEvaluateCallable(int begin, int end, 
+                    String intermediateFile) {
                 this.begin = begin;
                 this.end = end;
-                String path = new File(intermediateFile).getAbsoluteFile().toString();
+                String path = new File(intermediateFile).getAbsoluteFile().
+                        toString();
                 this.outputDir = path.substring(0, path.lastIndexOf("/") + 1);
             }
 
             /**
              * Evaluation of the NB model.
-             * @return a temporary File containing the predictions for this smaller
-             * part of the data for the current batch.
+             * @return a temporary File containing the predictions for this 
+             * smaller part of the data for the current batch.
              * @throws Exception
              */
             @Override
             public File call() throws Exception {
                 // Create a tmp file for this thread
-                File tmp_file = File.createTempFile("NB_thread_results", ".geo");
+                File tmp_file = File.createTempFile("NB_thread_results", 
+                        ".geo");
                 // Now get a tmp filename within the path of the preferred
                 // output destination
                 File tmp_file2 = new File(outputDir + tmp_file.getName());
                 // Already delete the first real temp file
                 tmp_file.delete();
                 // Open a writer to the output
-                PrintWriter file = new PrintWriter(new FileWriter(tmp_file2), true);
+                PrintWriter file = new PrintWriter(new FileWriter(tmp_file2), 
+                        true);
                 int processed = 0;
                 // For the part of the data this Callable processes
                 for (int i = begin; i < end; i++) {
@@ -544,7 +573,8 @@ public class NaiveBayes {
                         // Print the ID
                         file.print(item.getId() + "\t");
                         // Determine the best score for this item
-                        Map<Integer, Double> scores = new HashMap<Integer, Double>();
+                        Map<Integer, Double> scores = 
+                                new HashMap<Integer, Double>();
                         // For the current test item, evaluate the classes
                         int predictedClassId = getBestClass(item, scores);
                         // By sorting all classes evaluated in this batch
@@ -554,14 +584,15 @@ public class NaiveBayes {
                         if (predictedClassId >= 0) {
                             // Write the scores to file, tab separated
                             for (Integer classId : scores.keySet()) {
-                                file.print(classId + "\t" + scores.get(classId) + "\t");
+                                file.print(classId + "\t" + 
+                                        scores.get(classId) + "\t");
                                 file.flush();
                                 // Break after the 'winning' class ID and its 
                                 // score (in log space).
                                 break;
                             }
-                            // Write the number of features used for classification
-                            // to file as well.
+                            // Write the number of features used for 
+                            // classification to file as well.
                             file.println(item.getData().length);
                         } 
                         // This should not happen
@@ -569,7 +600,8 @@ public class NaiveBayes {
                             // So, if it does, bail out
                             file.close();
                             // Cry
-                            throw new RuntimeException("[NULL PREDICTION] " + item);
+                            throw new RuntimeException("[NULL PREDICTION] " + 
+                                    item);
                         }
                         // Publish progress on a 10K item level
                         if (processed % 10000 == 0) {
@@ -590,7 +622,8 @@ public class NaiveBayes {
              * @return the ID of the class that is considered to be the most
              * likely to contain the given DataItem that is being tested
              */
-            private int getBestClass(DataItem item, Map<Integer, Double> scores) {
+            private int getBestClass(DataItem item, 
+                    Map<Integer, Double> scores) {
                 // Fetch the features of the test object
                 Object[] features = item.getData();
                 // Init the best score as Min infinity
@@ -607,7 +640,8 @@ public class NaiveBayes {
                         // This should always be the case, but you never know...
                         if (feature instanceof Integer) {
                             // Add log score for this feature
-                            score += Math.log(nb_model[classId][(Integer)feature]);
+                            score += Math.log(
+                                    nb_model[classId][(Integer)feature]);
                         }
                     }
                     // Put score for this classID in the map
@@ -655,10 +689,12 @@ public class NaiveBayes {
                         // Check if we have this info
                         if (home != null) {
                             // Get the medoid for this class under consideration
-                            Point center = parameters.getClassMapper().getMedoids().get(classId);
+                            Point center = parameters.getClassMapper().
+                                    getMedoids().get(classId);
                             // Log score the prior using the info obtained
                             prior = Math.log(Math.pow(1. / 
-                                    (center.distance(itemH.getHomeLocation()) + 0.001),
+                                    (center.distance(itemH.getHomeLocation()) + 
+                                    0.001),
                                         parameters.home_weight));
                         }
                         // If we use the home prior, but don't have a home

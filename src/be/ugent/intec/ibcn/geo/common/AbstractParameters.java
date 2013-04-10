@@ -47,7 +47,8 @@ public abstract class AbstractParameters {
     }
     
     /**
-     * @return the package and classname of the parser to use for the training file.
+     * @return the package and classname of the parser to use for the training 
+     * file.
      */
     public String getTrainingParser() {
         return this.trainingParser;
@@ -67,7 +68,8 @@ public abstract class AbstractParameters {
     }
     
     /**
-     * @return the filename of the file containing the medoids for classification.
+     * @return the filename of the file containing the medoids for 
+     * classification.
      */
     public String getMedoidFile() {
         return this.medoidFile;
@@ -87,7 +89,8 @@ public abstract class AbstractParameters {
     }
     
     /**
-     * @return the package and classname of the parser to use for the medoid file.
+     * @return the package and classname of the parser to use for the medoid 
+     * file.
      */
     public String getMedoidParser() {
         return this.medoidParser;
@@ -99,7 +102,8 @@ public abstract class AbstractParameters {
     protected String testFile;
     
     /**
-     * Set the filename of the file containing the test items for classification.
+     * Set the filename of the file containing the test items for 
+     * classification.
      * @param testFile 
      */
     public void setTestFile(String testFile) {
@@ -107,7 +111,8 @@ public abstract class AbstractParameters {
     }
     
     /**
-     * @return the filename of the file containing the test items for classification.
+     * @return the filename of the file containing the test items for 
+     * classification.
      */
     public String getTestFile() {
         return this.testFile;
@@ -222,13 +227,15 @@ public abstract class AbstractParameters {
             throw new RuntimeException("Medoid file is not set.");
         
         if (medoidParser == null)
-            throw new RuntimeException("Parser class for medoid file is not set.");
+            throw new RuntimeException(
+                    "Parser class for medoid file is not set.");
         
         if (testFile == null)
             throw new RuntimeException("Test file is not set.");
         
         if (testParser == null)
-            throw new RuntimeException("Parser class for test file is not set.");
+            throw new RuntimeException(
+                    "Parser class for test file is not set.");
         
         if (classificationFile == null)
             throw new RuntimeException("Output file is not set.");

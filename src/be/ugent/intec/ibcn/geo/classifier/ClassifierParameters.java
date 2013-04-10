@@ -8,6 +8,8 @@ import java.util.Map;
  * Extend the common parameters with parameters that are specific to the 
  * classification process.
  * 
+ * @see AbstractParameters
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class ClassifierParameters extends AbstractParameters {
@@ -60,7 +62,6 @@ public class ClassifierParameters extends AbstractParameters {
     
     /**
      * Smoothing method that is currently applied.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0125
      */
     protected int smoothingMethod = -1;
 
@@ -80,7 +81,8 @@ public class ClassifierParameters extends AbstractParameters {
 
     /**
      * Set the lambda parameter for the Jelinek-Mercer smoothing technique.
-     * @param jelinekLambda the lambda parameter for the Jelinek-Mercer smoothing technique.
+     * @param jelinekLambda the lambda parameter for the Jelinek-Mercer 
+     * smoothing technique.
      */
     public void setJelinekLambda(double jelinekLambda) {
         this.jelinekLambda = jelinekLambda;
@@ -93,7 +95,8 @@ public class ClassifierParameters extends AbstractParameters {
 
     /**
      * Set the mu parameter for the Dirichlet smoothing technique.
-     * @param dirichletMu the mu parameter for the Dirichlet smoothing technique.
+     * @param dirichletMu the mu parameter for the Dirichlet smoothing 
+     * technique.
      */
     public void setDirichletMu(double dirichletMu) {
         this.dirichletMu = dirichletMu;
@@ -116,7 +119,6 @@ public class ClassifierParameters extends AbstractParameters {
     
     /**
      * Optionally, set the weight value to use for the home prior.
-     * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0110
      */
     protected double home_weight = -1;
     
@@ -140,7 +142,8 @@ public class ClassifierParameters extends AbstractParameters {
             throw new RuntimeException("Training file is not set.");
         
         if (trainingParser == null)
-            throw new RuntimeException("Parser class for training file is not set.");
+            throw new RuntimeException(
+                    "Parser class for training file is not set.");
         
         if (featureFile == null)
             throw new RuntimeException("Feature file is not set.");
@@ -156,11 +159,13 @@ public class ClassifierParameters extends AbstractParameters {
                 throw new RuntimeException("Smoothing method is not set.");
             case NaiveBayes.SMOOTHING_DIRICHLET:
                 if (dirichletMu < 0)
-                    throw new RuntimeException("Mu parameter for smoothing is not set.");
+                    throw new RuntimeException(
+                            "Mu parameter for smoothing is not set.");
                 break;
             case NaiveBayes.SMOOTHING_JELINEK:
                 if (jelinekLambda < 0)
-                    throw new RuntimeException("Lambda parameter for smoothing is not set.");
+                    throw new RuntimeException(
+                            "Lambda parameter for smoothing is not set.");
                 break;    
         }
         // Check necessary prior parameters
@@ -169,7 +174,8 @@ public class ClassifierParameters extends AbstractParameters {
                 throw new RuntimeException("Prior mode is not set.");
             case NaiveBayes.PRIOR_HOME:
                 if (home_weight < 0)
-                    throw new RuntimeException("K-value for home prior is not set.");
+                    throw new RuntimeException(
+                            "K-value for home prior is not set.");
                 break;
         }
         // Load the features

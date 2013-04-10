@@ -11,8 +11,8 @@ import java.util.concurrent.*;
 
 /**
  * This class extends the Chi Square functionality for feature ranking in such
- * a way that the maximum value of each feature is taken as an indicator of where
- * to rank it.
+ * a way that the maximum value of each feature is taken as an indicator of 
+ * where to rank it.
  *
  * @see be.ugent.intec.ibcn.geo.features.ChiSquareFeatureRanker
  * 
@@ -51,13 +51,14 @@ public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
         System.out.println("Doing "+ getMethodName() +" feature selection.");
         // Start timer
         long start = System.currentTimeMillis();        
-        // Prepare a map with the overall best scores and tags
+        // Prepare a map with the overall best scores and features
         Map<Object, Double> overall_best = new HashMap<Object, Double>();
         
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Track futures
-        List<Future<ScoringResult>> list = new ArrayList<Future<ScoringResult>>();
+        List<Future<ScoringResult>> list = 
+                new ArrayList<Future<ScoringResult>>();
         // For each GeoClass
         for (GeoClass geoclass : this.classmapper.getClasses()) {
             // Do chi2 calculation
@@ -71,15 +72,15 @@ public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
                 ChiSquareFeatureRanker.ScoringResult result = future.get();
                 Map<Object, Double> class_ranking = result.getScores();
                 
-                // Now for each tag in that ranking
-                for (Object tag : class_ranking.keySet()) {
+                // Now for each feature in that ranking
+                for (Object feature : class_ranking.keySet()) {
                     // If there is no value yet in the global map or or the chi2 
                     // value is better than the previous one
-                    if ((!overall_best.containsKey(tag) || 
-                            class_ranking.get(tag) > overall_best.get(tag)) && 
-                            ((String)tag).trim().length() > 0) {
+                    if ((!overall_best.containsKey(feature) || 
+                        class_ranking.get(feature) > overall_best.get(feature)) 
+                            && ((String)feature).trim().length() > 0) {
                         // Put or replace the chi2 value by the current one
-                        overall_best.put(tag, class_ranking.get(tag));
+                        overall_best.put(feature, class_ranking.get(feature));
                     }
                 }
             } catch (InterruptedException e) {
@@ -102,6 +103,7 @@ public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
         FeaturesIO.exportFeaturesToFile(features, outputfile);
         // Stop the timer
         long stop = System.currentTimeMillis();
-        System.out.println("Retained features: " + features.size() + " ("+(stop-start)+" ms.)");
+        System.out.println("Retained features: " + features.size() + 
+                " ("+(stop-start)+" ms.)");
     }
 }

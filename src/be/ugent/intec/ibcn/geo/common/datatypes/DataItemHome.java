@@ -17,7 +17,8 @@ package be.ugent.intec.ibcn.geo.common.datatypes;
 public class DataItemHome extends DataItem {
     
     /**
-     * Point datatype that is either null or the home location for this DataItem.
+     * Point datatype that is either null or the home location for this 
+     * DataItem.
      */
     private Point homeLocation = null;
     

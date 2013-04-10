@@ -5,8 +5,10 @@ import be.ugent.intec.ibcn.geo.common.AbstractParameters;
 /**
  * Extension of the base parameters for the referencing component.
  * 
- * At the moment, there are no additional parameters. This class is a placeholder
- * and implements a copy constructor given existing parameters.
+ * At the moment, there are no additional parameters. This class is a 
+ * placeholder and implements a copy constructor given existing parameters.
+ * 
+ * @see AbstractParameters
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */

@@ -76,7 +76,8 @@ public class DataLoading {
      * @param features a map containing the features used for this experiment
      * @return an array of DataItem objects
      */
-    public DataItem[] loadDataFromFile(String filename, String lineparser, int limit, Map<Object, Integer> features) {
+    public DataItem[] loadDataFromFile(String filename, String lineparser, 
+            int limit, Map<Object, Integer> features) {
         System.out.println("=| Parser:  " + lineparser);
         // Get the number of lines.
         int lines = FileIO.getNumberOfLines(filename);
@@ -95,14 +96,16 @@ public class DataLoading {
         List<DataLoaderHelper> helpers = new ArrayList<DataLoaderHelper>();
         int length = (int) (data.length * 1.0 / nr_threads);
         for (int i = 0; i < nr_threads; i++) {
-            // +1 because of the initial line should contain the line count of the file
+            // +1 because of the initial line should contain the line count of 
+            // the file
             int begin = i * length + 1;
             if (i == nr_threads - 1) {
                 length = data.length - (i * length);
             }
             int end = begin + length;
             // Instantiate, submit and track the helpers
-            DataLoaderHelper helper = new DataLoaderHelper(data, begin, end, filename, lineparser, features);
+            DataLoaderHelper helper = new DataLoaderHelper(data, begin, end, 
+                    filename, lineparser, features);
             executor.submit(helper);
             helpers.add(helper);
         }
@@ -129,7 +132,8 @@ public class DataLoading {
             }
         }
         // Print some stats
-        System.out.println("Loading complete. Non-null items: "+counter+" (" + (stop - start) + " ms.).");
+        System.out.println("Loading complete. Non-null items: "+counter+" (" + 
+                (stop - start) + " ms.).");
         System.out.println("+ Parser processed: " + parser_processed);
         System.out.println("+ Parser errors   : " + parser_errors);
         // Return the data
@@ -187,14 +191,18 @@ public class DataLoading {
          * @param end end index for processing
          * @param filename the filename of the input file
          * @param lineparser the package and classname of the input parser
-         * @param features a Map containing the features retained for this this experiment
+         * @param features a Map containing the features retained for this this 
+         * experiment
          */
-        public DataLoaderHelper(DataItem [] data, int begin, int end, String filename, String lineparser, Map<Object, Integer> features) {
+        public DataLoaderHelper(DataItem [] data, int begin, int end, 
+                String filename, String lineparser, 
+                Map<Object, Integer> features) {
             this.data = data;
             this.begin = begin;
             this.end = end;
             this.filename = filename;
-            this.parser = (AbstractLineParserDataItem)Util.getParser(lineparser);
+            this.parser = 
+                    (AbstractLineParserDataItem)Util.getParser(lineparser);
             this.parser.setFeatures(features);
             // First line of file should contain the number of lines in the file
             if (this.begin == 0)
@@ -207,7 +215,8 @@ public class DataLoading {
         @Override
         public void run() {
             try {
-                BufferedReader file = new BufferedReader(new FileReader(filename));
+                BufferedReader file = 
+                        new BufferedReader(new FileReader(filename));
                 String line = file.readLine();
                 // Skip lines until we reach the start
                 int skipcounter = 0;

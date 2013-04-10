@@ -40,7 +40,8 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
     protected double [] distances;
 
     /**
-     * Counter that tracks the number of items within certain distance thresholds.
+     * Counter that tracks the number of items within certain distance 
+     * thresholds.
      */
     protected int [] counters;
     
@@ -59,11 +60,13 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
      * @param training_data Training data
      * @param test_data Test data
      */
-    public DistanceThresholdAnalyzer(AnalyzerParameters parameters, double [] distances) {
+    public DistanceThresholdAnalyzer(AnalyzerParameters parameters, 
+            double [] distances) {
         super(parameters);
         this.distances = distances;
         if (parameters.getClassMapper() != null)
-            this.nmf = new NearestMedoidFinder(parameters.getClassMapper().getMedoids());
+            this.nmf = new NearestMedoidFinder(parameters.getClassMapper().
+                    getMedoids());
     }
     
     @Override
@@ -98,7 +101,8 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
                         // If we have a NearestMedoidFinder
                         if (this.nmf != null) {
                             // Fetch the class of the predicted location
-                            int predictedClass = nmf.getNearestMedoid(predictedLocation);
+                            int predictedClass = 
+                                    nmf.getNearestMedoid(predictedLocation);
                             // Fetch the class where it should be (ground truth)
                             int actualClass = nmf.getNearestMedoid(item);
                             if (predictedClass == actualClass)
@@ -150,23 +154,29 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
         }
         System.out.print(filename + "\t");
         for (int i = 0; i < this.distances.length; i++)
-            System.out.print(formatter.format(counters[i] * 100. / processed) + "\t");
+            System.out.print(formatter.format(counters[i] * 100. / processed) + 
+                    "\t");
         System.out.println(formatter.format(distance));
         System.out.println("");
         // If there was a need for accuracy on clustering level
         if (this.nmf != null) {
             // Report the accuracy at the clustering level
-            System.out.println("Acc "+ parameters.getClassMapper().size() +":\t" + 
+            System.out.println("Acc "+ parameters.getClassMapper().size() +
+                    ":\t" + 
                     classCorrect+"\t"+processed+"\t"+ 
                     formatter.format(classCorrect * 100. / processed));
             System.out.println("");
         }
         // Report the distance stats
         for (int i = 0; i < this.distances.length; i++)
-            System.out.println(this.distances[i] + "\t" + formatter.format(counters[i] * 100. / processed) + "\t"+counters[i]+"\t"+processed);
+            System.out.println(this.distances[i] + "\t" + 
+                    formatter.format(counters[i] * 100. / processed) + "\t"+
+                    counters[i]+"\t"+processed);
         // Report quartile statistics
-        System.out.println(filename + " Q1\t" + formatter.format(tmp_distances.get((int)(tmp_distances.size()*0.25))));
+        System.out.println(filename + " Q1\t" + formatter.format(
+                tmp_distances.get((int)(tmp_distances.size()*0.25))));
         System.out.println(filename + " Q2\t" + formatter.format(distance));
-        System.out.println(filename + " Q3\t" + formatter.format(tmp_distances.get((int)(tmp_distances.size()*0.75))));
+        System.out.println(filename + " Q3\t" + formatter.format(
+                tmp_distances.get((int)(tmp_distances.size()*0.75))));
     }
 }

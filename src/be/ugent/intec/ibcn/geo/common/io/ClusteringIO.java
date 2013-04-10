@@ -1,9 +1,9 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
 import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
+import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
-import be.ugent.intec.ibcn.geo.common.Util;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.concurrent.Executors;
 
 /**
  * This class provides the necessary IO methods to read training data from file,
- * using the generic LineParserPoint interface. Secondly, this class provides the
- * IO code to write the clustering back to file.
+ * using the generic LineParserPoint interface. Secondly, this class provides 
+ * the IO code to write the clustering back to file.
  * 
  * The number of training lines is expected to be the first line
  * of the training file. If this number is not found (currently detected by a
@@ -23,14 +23,15 @@ import java.util.concurrent.Executors;
  * 
  * The current IO for clustering, loads all the training items as Point objects
  * INTO AN ARRAY, so this component might be a bottleneck if you try to cluster
- * tens of millions training items. Be sure to set your -Xms and -Xmx memory sizes
- * to appropriate values.
+ * tens of millions training items. Be sure to set your -Xms and -Xmx memory 
+ * sizes to appropriate values.
  * 
- * Also, the current IO loading divides the training data into a number of blocks.
- * Due to this, the last thread, reads the input file and skips N-1 blocks of data
- * from the start. This can be optimized by using a semaphore/lock, as has been
- * implemented in other parts of this framework. This would allow each thread to
- * fetch for instance 25000 lines to process, until the file is at the end.
+ * Also, the current IO loading divides the training data into a number of 
+ * blocks. Due to this, the last thread, reads the input file and skips N-1 
+ * blocks of data from the start. This can be optimized by using a semaphore/
+ * lock, as has been implemented in other parts of this framework. This would 
+ * allow each thread to fetch for instance 25000 lines to process, until the 
+ * file is at the end.
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
@@ -39,7 +40,8 @@ public class ClusteringIO {
     /**
      * Holds the number of available threads.
      */
-    private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    private static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
     
     /**
      * Variable holding the number of training items to process before reporting
@@ -92,10 +94,12 @@ public class ClusteringIO {
      * Load data from file.
      * @param filename File to read the data from
      * @param lineparser Classname of the lineparser implementation to use
-     * @param limit -1 means all lines, a value >= 0 means a limit on the lines to process
+     * @param limit -1 means all lines, a value >= 0 means a limit on the lines 
+     * to process
      * @return an array
      */
-    public Point[] loadDataFromFile(String filename, String lineparser, int limit) {
+    public Point[] loadDataFromFile(String filename, String lineparser, 
+            int limit) {
         System.out.println("=| Parser:  " + lineparser);
         // Fetch the number of lines to process
         int lines = FileIO.getNumberOfLines(filename);
@@ -118,7 +122,8 @@ public class ClusteringIO {
         // Determine the block length for each thread to process
         int length = (int) (data.length * 1.0 / NR_THREADS);
         for (int i = 0; i < NR_THREADS; i++) {
-            // +1 because of the initial line containing the line count of the file
+            // +1 because of the initial line containing the line count of the 
+            // file
             int begin = i * length + 1;
             // If this is the last thread
             if (i == NR_THREADS - 1) {
@@ -127,8 +132,10 @@ public class ClusteringIO {
             }
             // Determine end value
             int end = begin + length;
-            // Init the helper thread with a reference to the data, begin, end, filename and parser
-            DataLoaderHelper helper = new DataLoaderHelper(data, begin, end, filename, lineparser);
+            // Init the helper thread with a reference to the data, begin, end, 
+            // filename and parser
+            DataLoaderHelper helper = new DataLoaderHelper(data, begin, end, 
+                    filename, lineparser);
             // submit the helper
             executor.submit(helper);
             // track the helper instance
@@ -158,7 +165,8 @@ public class ClusteringIO {
                 counter++;
             }
         }
-        System.out.println("Loading complete. Non-null items: "+counter+" (" + (stop - start) + " ms.).");
+        System.out.println("Loading complete. Non-null items: "+counter+" (" + 
+                (stop - start) + " ms.).");
         System.out.println("+ Parser processed: " + parser_processed);
         System.out.println("+ Parser errors   : " + parser_errors);
         
@@ -215,7 +223,8 @@ public class ClusteringIO {
          * @param begin Start index
          * @param end End index
          * @param filename Filename to process
-         * @param lineparserpoint class name of the LineParserPoint implementation to use
+         * @param lineparserpoint class name of the LineParserPoint 
+         * implementation to use
          */
         public DataLoaderHelper(Point [] data, int begin, int end, 
                 String filename, String lineparserpoint) {
@@ -237,7 +246,8 @@ public class ClusteringIO {
         public void run() {
             try {
                 // Set up the input
-                BufferedReader file = new BufferedReader(new FileReader(filename));
+                BufferedReader file = new BufferedReader(
+                        new FileReader(filename));
                 String line = file.readLine();
                 int skipcounter = 0;
                 // Skip the necessary number of lines to get to the part of the
@@ -278,7 +288,8 @@ public class ClusteringIO {
      * @param clusters The resulting clusters from the algorithm
      * @param outputfile The name of the file to write the clusters to.
      */
-    public void writeClusteringToFile(Map<Long, Cluster> clusters, String outputfile) {
+    public void writeClusteringToFile(Map<Long, Cluster> clusters, 
+            String outputfile) {
         writeClusteringToFile(clusters, outputfile, false);
     }
 
@@ -286,11 +297,12 @@ public class ClusteringIO {
      * Helper method that facilitates writing a given grid-clustering to file.
      * @param clusters The resulting clusters from the algorithm
      * @param outputfile The name of the file to write the clusters to.
-     * @param fullWrite If set to true, not only the ID,lat,lon will be written to file,
-     * but all the elements in the cluster as well. This is mainly for visualization and
-     * debugging purposes only.
+     * @param fullWrite If set to true, not only the ID,lat,lon will be written 
+     * to file, but all the elements in the cluster as well. This is mainly for 
+     * visualization and debugging purposes only.
      */
-    public void writeClusteringToFile(Map<Long, Cluster> clusters, String outputfile, boolean fullWrite) {
+    public void writeClusteringToFile(Map<Long, Cluster> clusters, 
+            String outputfile, boolean fullWrite) {
         try {
             PrintWriter file = new PrintWriter(new FileWriter(outputfile));
             for (Cluster c : clusters.values()) {
@@ -300,14 +312,15 @@ public class ClusteringIO {
                 else {
                     // Write the center data to file
                     Point center = c.getCenter();
-                    file.println(center.getId() + "," + center.getLatitude() + "," 
-                            + center.getLongitude());
+                    file.println(center.getId() + "," + center.getLatitude() + 
+                            "," + center.getLongitude());
                 }
             }
             file.close();
         }
         catch (IOException e) {
-            System.err.println("Error writing clustering to file: " + e.getMessage());
+            System.err.println("Error writing clustering to file: " + 
+                    e.getMessage());
             System.exit(-1);
         }
     }
@@ -317,7 +330,8 @@ public class ClusteringIO {
      * @param clusters The resulting clusters from the algorithm
      * @param outputfile The name of the file to write the clusters to.
      */
-    public void writeClusteringToFile(List<Cluster> clusters, String outputfile) {
+    public void writeClusteringToFile(List<Cluster> clusters, 
+            String outputfile) {
         writeClusteringToFile(clusters, outputfile, false);
     }
     
@@ -325,11 +339,12 @@ public class ClusteringIO {
      * Helper method that facilitates writing a given clustering to file.
      * @param clusters The resulting clusters from the algorithm
      * @param outputfile The name of the file to write the clusters to.
-     * @param fullWrite If set to true, not only the ID,lat,lon will be written to file,
-     * but all the elements in the cluster as well. This is mainly for visualization and
-     * debugging purposes only.
+     * @param fullWrite If set to true, not only the ID,lat,lon will be written 
+     * to file, but all the elements in the cluster as well. This is mainly for 
+     * visualization and debugging purposes only.
      */
-    public void writeClusteringToFile(List<Cluster> clusters, String outputfile, boolean fullWrite) {
+    public void writeClusteringToFile(List<Cluster> clusters, String outputfile,
+            boolean fullWrite) {
         try {
             PrintWriter file = new PrintWriter(new FileWriter(outputfile));
             for (Cluster c : clusters) {
@@ -339,14 +354,15 @@ public class ClusteringIO {
                 else {
                     // Write the center data to file
                     Point center = c.getCenter();
-                    file.println(center.getId() + "," + center.getLatitude() + "," 
-                            + center.getLongitude());
+                    file.println(center.getId() + "," + center.getLatitude() + 
+                            "," + center.getLongitude());
                 }
             }
             file.close();
         }
         catch (IOException e) {
-            System.err.println("Error writing clustering to file: " + e.getMessage());
+            System.err.println("Error writing clustering to file: " + 
+                    e.getMessage());
             System.exit(-1);
         }
     }    

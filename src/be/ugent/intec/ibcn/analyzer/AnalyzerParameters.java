@@ -16,6 +16,8 @@ import java.util.List;
  * is overriden to adapt the failure behaviour on missing parameters, as not all
  * the parameters for referencing are necessary for analyzing.
  * 
+ * @see AbstractParameters
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class AnalyzerParameters extends ReferencingParameters{
@@ -55,7 +57,8 @@ public class AnalyzerParameters extends ReferencingParameters{
             throw new RuntimeException("Test file is not set.");
         
         if (testParser == null)
-            throw new RuntimeException("Parser class for test file is not set.");
+            throw new RuntimeException(
+                    "Parser class for test file is not set.");
 
         // Only load if the optional fields are set
         if (medoidFile != null && medoidParser != null) {

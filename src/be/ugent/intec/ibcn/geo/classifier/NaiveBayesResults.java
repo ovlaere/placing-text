@@ -85,7 +85,7 @@ public class NaiveBayesResults {
     }
 
     /**
-     * Put the tag count for a test item by ID.
+     * Put the feature count for a test item by ID.
      * @param id The ID of the test item for which you want to put the count.
      * @param featureCount the actual feature count you want to put.
      */
@@ -156,7 +156,7 @@ public class NaiveBayesResults {
                 int id = Integer.parseInt(values[0]);
                 int prediction = Integer.parseInt(values[1]);
                 double score = Double.parseDouble(values[2]);
-                int tagCount = Integer.parseInt(values[3]);
+                int featureCount = Integer.parseInt(values[3]);
                 List<Integer> list = class_items.get(prediction);
                 if (list == null)
                     list = new ArrayList<Integer>();
@@ -164,7 +164,7 @@ public class NaiveBayesResults {
                 // Put data in data structures
                 class_items.put(prediction, list);
                 predictions.put(id, prediction);
-                features.put(id, tagCount);
+                features.put(id, featureCount);
                 scores.put(id, score);
                 line = in.readLine();
             }

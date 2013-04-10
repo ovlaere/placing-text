@@ -6,6 +6,9 @@ import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
  * This class represents a comparable DataItem. The comparison is done using
  * the similarity scores of the items.
  * 
+ * @see Similarity
+ * @see DataItem
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class SimilarItem implements Comparable<SimilarItem> {
@@ -69,10 +72,12 @@ public class SimilarItem implements Comparable<SimilarItem> {
             return false;
         }
         final SimilarItem other = (SimilarItem) obj;
-        if (this.item != other.item && (this.item == null || !this.item.equals(other.item))) {
+        if (this.item != other.item && (this.item == null || 
+                !this.item.equals(other.item))) {
             return false;
         }
-        if (Double.doubleToLongBits(this.score) != Double.doubleToLongBits(other.score)) {
+        if (Double.doubleToLongBits(this.score) != 
+                Double.doubleToLongBits(other.score)) {
             return false;
         }
         return true;
@@ -82,7 +87,8 @@ public class SimilarItem implements Comparable<SimilarItem> {
     public int hashCode() {
         int hash = 7;
         hash = 37 * hash + (this.item != null ? this.item.hashCode() : 0);
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.score) ^ (Double.doubleToLongBits(this.score) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.score) ^ 
+                (Double.doubleToLongBits(this.score) >>> 32));
         return hash;
     }
 

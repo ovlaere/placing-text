@@ -28,7 +28,8 @@ public class ClassMapper {
     /**
      * Number of threads, for multi-threaded processing.
      */
-    protected static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    protected static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
 
     /**
      * The KD-tree used for NN-retrieval
@@ -272,7 +273,8 @@ public class ClassMapper {
          * @param end End index for processing.
          * @param tree Local copy of the KD tree
          */
-        public AttachHelper(DataItem [] data, int begin, int end, KDTree<Integer> tree) {
+        public AttachHelper(DataItem [] data, int begin, int end, 
+                KDTree<Integer> tree) {
             this.data = data;
             this.begin = begin;
             this.end = end;

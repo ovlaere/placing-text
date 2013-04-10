@@ -13,12 +13,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * This class contains an optimized implementation of the Partition Around Medoids
- * (PAM) algorithm, a k-means variant. 
+ * This class contains an optimized implementation of the Partition Around 
+ * Medoids (PAM) algorithm, a k-means variant. 
  * 
  * For more details on the algorithm, 
- *  @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0045
- *  @see http://en.wikipedia.org/wiki/K-medoids
+ * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0045
+ * @see http://en.wikipedia.org/wiki/K-medoids
  * 
  * The algorithm makes use of a KD-tree for retrieving the nearest neighbours. 
  * To download the implementation of this data structure
@@ -91,10 +91,12 @@ public class PamClustering extends AbstractClustering {
      * @param data Array of Point data to cluster
      * @param numberOfClusters the required number of clusters
      */
-    public PamClustering(PamParameters parameters, Point [] data, int numberOfClusters) {
+    public PamClustering(PamParameters parameters, Point [] data, 
+            int numberOfClusters) {
         super(parameters);
         this.numberOfClusters = numberOfClusters;
-        // Convert the input data to a synchronized List (as Vector is deprecated)
+        // Convert the input data to a synchronized List (as Vector 
+        // is deprecated)
         this.points = Collections.synchronizedList(
                 new ArrayList<Point>(Arrays.asList(data)));
     }
@@ -112,9 +114,11 @@ public class PamClustering extends AbstractClustering {
         ClusteringIO cio = new ClusteringIO();
         
         // Store the original min improvement threshold
-        double original_optimization_min_improvement = parameters.optimization_min_improvement;
+        double original_optimization_min_improvement = 
+                parameters.optimization_min_improvement;
         // Switch to an improvement threshold for clusters in progress
-        parameters.optimization_min_improvement = ((PamParameters)parameters).cost_improvement_threshold_partial;
+        parameters.optimization_min_improvement = 
+                ((PamParameters)parameters).cost_improvement_threshold_partial;
         
         // Init the overall timer
         long overall_start = System.currentTimeMillis();
@@ -123,9 +127,11 @@ public class PamClustering extends AbstractClustering {
          * Step 1. Initialize: randomly select k of the n data points as the
          * mediods.
          */
-        System.out.println("[PAM][Algorithm][Step 1] Initial medoid selection. (#"+ numberOfClusters + ")");
+        System.out.println("[PAM][Algorithm][Step 1] Initial medoid selection. "
+                + "(#"+ numberOfClusters + ")");
         // Provide a map to track the current medoids
-        Map<Integer, InitialPoint> medoids = new HashMap<Integer, InitialPoint>(numberOfClusters);
+        Map<Integer, InitialPoint> medoids = 
+                new HashMap<Integer, InitialPoint>(numberOfClusters);
         // Start a timer
         long start = System.currentTimeMillis();        
         // make a D-dimensional KD-tree for the Coordinates
@@ -141,7 +147,8 @@ public class PamClustering extends AbstractClustering {
             if (initial_kd.size() > 0) {
                 try {
                     // Check their distance
-                    List<Integer> nbrs = initial_kd.nearest(new Coordinate(p).doubleKey(), 1);
+                    List<Integer> nbrs = initial_kd.nearest(
+                            new Coordinate(p).doubleKey(), 1);
                     // If the current candidate is within 0.001m of a medoid
                     if (p.distance(medoids.get(nbrs.get(0))) <= 1E-3)
                         // Reject it as a valid candidate
@@ -170,7 +177,8 @@ public class PamClustering extends AbstractClustering {
         }
         // Stop the timer - Init complete
         long stop = System.currentTimeMillis();
-        System.out.println(" - Selected " + medoids.size() + " medoids. (Time: " + (stop - start) + " ms.)");
+        System.out.println(" - Selected " + medoids.size() + " medoids. (Time: "
+                + (stop - start) + " ms.)");
         // Create a list of the current clusters
         List<Cluster> clusters = new ArrayList<Cluster>();
         for (Point point : medoids.values()) {
@@ -188,13 +196,15 @@ public class PamClustering extends AbstractClustering {
             iteration_start = System.currentTimeMillis();
             // Clear any possible change flags
             resetChangeFlags();
-            System.out.println("\n========] Iteration " + ++iterations + " [========\n");
+            System.out.println("\n========] Iteration " + ++iterations + 
+                    " [========\n");
             start = System.currentTimeMillis();
             for (Cluster cluster : clusters) {
                 // Remove all data points
                 cluster.clearElements();
             }
-            System.out.println("[PAM][Algorithm][Step 2] Assigning " + points.size() + " datapoints to the closest medoid.");
+            System.out.println("[PAM][Algorithm][Step 2] Assigning " + 
+                    points.size() + " datapoints to the closest medoid.");
 
             // make a D-dimensional KD-tree
             KDTree<Integer> kd = new KDTree<Integer>(3);
@@ -213,7 +223,8 @@ public class PamClustering extends AbstractClustering {
             // For each data point, find the nearest neighbour
             for (Point p  : points) {
                 try {
-                    List<Integer> nbrs = kd.nearest(new Coordinate(p).doubleKey(), 1);
+                    List<Integer> nbrs = kd.nearest(
+                            new Coordinate(p).doubleKey(), 1);
                     // Fetch the closest cluster
                     Cluster best_cluster = clusters.get(nbrs.get(0));
                     // Add this element to that cluster
@@ -236,7 +247,8 @@ public class PamClustering extends AbstractClustering {
             /*
              * Step 3. For each mediod m
              */
-            System.out.println("[PAM][Algorithm][Step 3] Improving cluster configurations.");
+            System.out.println("[PAM][Algorithm][Step 3] Improving cluster "
+                    + "configurations.");
             // Create a thread pool
             ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
             // For each cluster
@@ -264,7 +276,8 @@ public class PamClustering extends AbstractClustering {
             System.out.println("Checksum: " + after_checksum);
             // This should not happen, unless we have threading issues!
             if (before_checksum != after_checksum) {
-                throw new RuntimeException("Checksum differs before and after iteration!");
+                throw new RuntimeException("Checksum differs before and after "
+                        + "iteration!");
             }
 
             // Optionally, merge clusters below a certain threshold
@@ -275,7 +288,8 @@ public class PamClustering extends AbstractClustering {
                 List<Cluster> new_clusters = new ArrayList<Cluster>();
                 for (Cluster cluster : clusters) {
                     // If a cluster is below the threshold
-                    if (cluster.size() < ((PamParameters)parameters).min_cluster_size) {
+                    if (cluster.size() < 
+                            ((PamParameters)parameters).min_cluster_size) {
                         // Store the cluster that is below the threshold
                         clusters_below.add(cluster);
                         // Fetch it's center
@@ -283,8 +297,8 @@ public class PamClustering extends AbstractClustering {
                         // Add it as a data point
                         points.add(center);
                         // Once the cluster is removed, the datapoints will be
-                        // reset in the next iteration and everything will start all
-                        // over again
+                        // reset in the next iteration and everything will start
+                        // all over again
                     } 
                     else {
                         // Just copy the cluster without processing
@@ -312,12 +326,14 @@ public class PamClustering extends AbstractClustering {
                 }
             }
             // Write the current iteration to the result file, just in case
-            cio.writeClusteringToFile(clusters, outputfile, parameters.writeFullClusteringToFile);
+            cio.writeClusteringToFile(clusters, outputfile, 
+                    parameters.writeFullClusteringToFile);
         }
         // keep doing this for as long as there are changes to the clusters
         // or clusters are being merged
         // and the number of iterations is smaller than the iterationlimit
-        while (clusterChanged() && iterations < ((PamParameters)parameters).iterationLimit);
+        while (clusterChanged() && 
+                iterations < ((PamParameters)parameters).iterationLimit);
 
         /*
          * 3. For each mediod m 
@@ -330,7 +346,8 @@ public class PamClustering extends AbstractClustering {
         long overall_stop = System.currentTimeMillis();
 
         // Restore the original min improvement threshold
-        parameters.optimization_min_improvement = original_optimization_min_improvement;
+        parameters.optimization_min_improvement = 
+                original_optimization_min_improvement;
         
         int clusters_threshold = 0;
         int empty_clusters = 0;
@@ -354,7 +371,8 @@ public class PamClustering extends AbstractClustering {
                     max_size = cluster.size();
         }
         // Write the final clustering to file
-        cio.writeClusteringToFile(clusters, outputfile, parameters.isWriteFullClusteringToFile());
+        cio.writeClusteringToFile(clusters, outputfile, 
+                parameters.isWriteFullClusteringToFile());
 
         // Print some stats
         System.out.println("[PAM] Clustering summary");
@@ -362,10 +380,13 @@ public class PamClustering extends AbstractClustering {
                         + " iterations.");
         System.out.println(" - Total clusters: " + clusters.size());
         System.out.println(" - Empty clusters: " + empty_clusters);
-        System.out.println(" - Clusters < " + ((PamParameters)parameters).min_cluster_size + ": "
+        System.out.println(" - Clusters < " + 
+                ((PamParameters)parameters).min_cluster_size + ": "
                         + clusters_threshold);
         if (clusters.size() - empty_clusters != 0)
-            System.out.println(" - Avg cluster size (non-empty): " + ((int) ((points.size() * 1.0) + clusters.size()) / (clusters.size() - empty_clusters)));
+            System.out.println(" - Avg cluster size (non-empty): " + 
+                    ((int) ((points.size() * 1.0) + clusters.size()) / 
+                    (clusters.size() - empty_clusters)));
         System.out.println(" - Min cluster size (>0): " + min_size);
         System.out.println(" - Max cluster size: " + max_size);
         System.out.println("[=======================]");
@@ -376,13 +397,15 @@ public class PamClustering extends AbstractClustering {
     /**
      * Helper class that overrides the default Cluster optimizer. This allows
      * to reuse almost all of the code of the optimizer, while with minimal
-     * effort, some administration specific to the PAM algorithm can be executed.
+     * effort, some administration specific to the PAM algorithm can be 
+     * executed.
      */
     private class PamClusterOptimizer extends ClusterOptimizer{
 
         /**
-         * Reference to the overall dataset of Points. This has to be a synchronized
-         * structure or the multithreading will loose datapoints here.
+         * Reference to the overall dataset of Points. This has to be a 
+         * synchronized structure or the multithreading will loose datapoints 
+         * here.
          */
         private List<Point> dataset;
 
@@ -396,31 +419,35 @@ public class PamClustering extends AbstractClustering {
         }
 
         /**
-         * Override of the original method to be able to invoke only one iteration,
-         * and call flagChange() to schedule a next iteration in the PAM algorithm.
+         * Override of the original method to be able to invoke only one 
+         * iteration, and call flagChange() to schedule a next iteration in the 
+         * PAM algorithm.
          * @param bestCenter Best center so far
          * @param cluster Cluster object
          * @param original_cost 
          * @param cost
-         * @return always false - no more iterations in the case of PAM optimization
+         * @return always false - no more iterations in the case of PAM 
+         * optimization
          */
         @Override        
         protected boolean finalSwap(Point bestCenter, Cluster cluster, 
             double original_cost, double cost) {
-            System.out.println("[Thread-" + Thread.currentThread().getId() + "] "
-                                + cluster.getCenter() + " -> " + bestCenter
-                                + " (Cost: " + original_cost + " -> " + cost + " )");
+            System.out.println("[Thread-" + Thread.currentThread().getId() + 
+                    "] " + cluster.getCenter() + " -> " + bestCenter +
+                    " (Cost: " + original_cost + " -> " + cost + " )");
             
-            // Process the change in the dataset we are using by removin the point 
-            // that becomes the new center
+            // Process the change in the dataset we are using by removin the 
+            // point that becomes the new center
             dataset.remove(bestCenter);
             // add the old center as a new datapoint
             dataset.add(cluster.getCenter());
             // Process the cluster change
             cluster.swapCenter(bestCenter);
-            // Mark this as a change to inform that a new PAM iteration is needed
+            // Mark this as a change to inform that a new PAM iteration is 
+            // needed
             flagChange();
-            // Pam optimization is run only once, as we do multiple iterations anyway
+            // Pam optimization is run only once, as we do multiple iterations 
+            // anyway
             return false;
         }
     }

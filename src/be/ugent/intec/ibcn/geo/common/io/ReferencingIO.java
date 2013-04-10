@@ -7,11 +7,17 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 /**
- * TODO Add comment
+ * IO Class for the georeferencing package.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class ReferencingIO {
-    
+ 
+    /**
+     * Write a given map of location predictions to file.
+     * @param predictions A map containing a Point prediction for each ID
+     * @param outputFileName the filename to write the predictions to.
+     */
     public static void writeLocationsToFile(Map<Integer, Point> predictions,
             String outputFileName) {
         try {

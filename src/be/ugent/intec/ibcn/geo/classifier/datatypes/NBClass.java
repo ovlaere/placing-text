@@ -42,7 +42,8 @@ public class NBClass extends GeoClass {
     /**
      * Constructor.
      * @param id ID of the medoid used for this NBClass.
-     * @param originalId original ID (from file) for the medoid used for this NBClass.
+     * @param originalId original ID (from file) for the medoid used for this 
+     * NBClass.
      */
     public NBClass(int id, int originalId) {
         super(id, originalId);

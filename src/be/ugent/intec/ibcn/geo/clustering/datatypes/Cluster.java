@@ -11,7 +11,7 @@ import java.util.Set;
  * A Cluster has a specific Point as its center, and a Set of Points as
  * the elements that belong to this cluster.
  * 
- * @author ovlaere
+ * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class Cluster {
 
@@ -172,8 +172,10 @@ public class Cluster {
     /**
      * equals() implementation
      * @param obj
-     * @return true the center of the two clusters are equals (have the same
-     * pkid)
+     * @return true if the center of the two clusters are equal (which means
+     * equal ID)
+     * 
+     * @see Point
      */
     @Override
     public boolean equals(Object obj) {
@@ -184,7 +186,8 @@ public class Cluster {
             return false;
         }
         final Cluster other = (Cluster) obj;
-        if (this.center != other.center && (this.center == null || !this.center.equals(other.center))) {
+        if (this.center != other.center && (this.center == null || 
+                !this.center.equals(other.center))) {
             return false;
         }
         return true;
@@ -202,7 +205,8 @@ public class Cluster {
     }
 
     /**
-     * @return A String representation of this cluster, with some added statistics.
+     * @return A String representation of this cluster, with some added 
+     * statistics.
      */
     public String clustering() {
         StringBuilder result = new StringBuilder();

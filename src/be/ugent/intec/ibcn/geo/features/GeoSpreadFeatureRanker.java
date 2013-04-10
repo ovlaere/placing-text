@@ -2,9 +2,9 @@ package be.ugent.intec.ibcn.geo.features;
 
 import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,14 +20,15 @@ import java.util.concurrent.*;
  *  @see http://ceur-ws.org/Vol-807/Hauff_WISTUD_Placing_me11wn.pdf
  * 
  * Also see
- *  @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0090
+ * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0090
  * 
  * If you use this code for academic research, please cite the paper above.
  *
  * This implementation will 'batch' process a large number of features. This can
- * be done in memory if a sufficient amount of memory is available (e.g. 16GB or ram).
- * In that case, up to 20M features can be 'tracked' and calculated. If more than
- * 20M unique features are used, the batch process will come into play:
+ * be done in memory if a sufficient amount of memory is available (e.g. 16GB 
+ * of ram). In that case, up to 20M features can be 'tracked' and calculated. 
+ * If more than 20M unique features are used, the batch process will come into 
+ * play:
  * - the code will loop over the input file, assigning and counting features
  * to the grid
  * - the geoscore will be calculated for those features
@@ -41,7 +42,8 @@ public class GeoSpreadFeatureRanker {
     /**
      * Number of threads, for multi-threaded processing.
      */
-    private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    private static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
 
     /**
      * @return the name of this ranking method
@@ -86,56 +88,58 @@ public class GeoSpreadFeatureRanker {
     private static final int REPORT_SIZE_PROCESS = 10000;
     
     /**
-     * Number of tags to process by each thread individually. The lower the number,
-     * the less likely the change all other threads will be waiting for the one
-     * thread processing the 'hardest' cases (i.e. tags with a significantly larger
-     * number of occurrences).
+     * Number of features to process by each thread individually. The lower the 
+     * number, the less likely the change all other threads will be waiting for 
+     * the one thread processing the 'hardest' cases (i.e. features with a 
+     * significantly larger number of occurrences).
      */
     private int thread_batch_size = 100;
     
     /**
-     * Set the number of tags to process by each thread individually. The lower 
-     * the number, the less likely the change all other threads will be waiting 
-     * for the one thread processing the 'hardest' cases (i.e. tags with a 
-     * significantly larger number of occurrences).
-     * @param size Number of tags to process by each thread individually.
+     * Set the number of features to process by each thread individually. The 
+     * lower the number, the less likely the change all other threads will be 
+     * waiting for the one thread processing the 'hardest' cases (i.e. features 
+     * with a significantly larger number of occurrences).
+     * @param size Number of features to process by each thread individually.
      */
     public void setThreadBatchSize(int size) {
         this.thread_batch_size = size;
     }
     
     /**
-     * The maximum number of tags to process in one run through the training file.
-     * The value of this variable is determined by the amount of available memory
-     * to the virtual machine. The higher the number, the faster the ranking will
-     * be over, unless you run out of memory. Limiting this value will make the
-     * code batch over the input file multiple times (which can be a pain if the
-     * training contains e.g. 60M items), but you will be able to compute an 
-     * overall ranking.
+     * The maximum number of features to process in one run through the training
+     * file. The value of this variable is determined by the amount of available
+     * memory to the virtual machine. The higher the number, the faster the 
+     * ranking will be over, unless you run out of memory. Limiting this value 
+     * will make the code batch over the input file multiple times (which can be
+     * a pain if the training contains e.g. 60M items), but you will be able to 
+     * compute an overall ranking.
      */
     private int batch_limit = 20000000;
     
     /**
-     * Set the maximum number of tags to process in one run through the training file.
-     * @param limit the maximum number of tags to process in one run through the training file.
+     * Set the maximum number of features to process in one run through the 
+     * training file.
+     * @param limit the maximum number of features to process in one run through
+     * the training file.
      */
     public void setBatchLimit(int limit) {
         this.batch_limit = limit;
     }
     
     /**
-     * Table holding maps of tag - count pairs, to keep track of occurrences
-     * of tags along the grid over the world.
+     * Table holding maps of feature - count pairs, to keep track of occurrences
+     * of features along the grid over the world.
      */
     private HashMap<CellPoint, Integer> [] stats;
 
     /**
-     * On the fly tag (likely String) to ID mapping.
+     * On the fly feature (likely String) to ID mapping.
      */
     private Map<Object, Integer> feature_id;
     
     /**
-     * Revert id to tag mapping.
+     * Revert id to feature mapping.
      */
     private Map<Integer, Object> id_feature;
     
@@ -169,22 +173,27 @@ public class GeoSpreadFeatureRanker {
     /**
      * Actual feature ranking method.
      * @param inputFile Training file to process
-     * @param lineparserClassName Class name of the line parser implementation to use for parsing training lines
-     * @param limit Possible limit to the number of lines to process from the input (-1 means no limit)
+     * @param lineparserClassName Class name of the line parser implementation 
+     * to use for parsing training lines
+     * @param limit Possible limit to the number of lines to process from the 
+     * input (-1 means no limit)
      * @param outputfile Outputfile for the feature ranking
      */
-    public void process(String inputFile, String lineparserClassName, int limit, String outputfile) {
+    public void process(String inputFile, String lineparserClassName, int limit,
+            String outputfile) {
         System.out.println("Doing "+ getMethodName() +" feature selection.");
         // Publish the batch limit value
         System.out.println("BATCH LIMIT " + batch_limit);
         // Instantiate the parser
-        AbstractLineParserDataItem parser = (AbstractLineParserDataItem)Util.getParser(lineparserClassName);
-        // Prepare a map for the tags and their scores
+        AbstractLineParserDataItem parser = 
+                (AbstractLineParserDataItem)Util.getParser(lineparserClassName);
+        // Prepare a map for the features and their scores
         Map<Object, GeoScore> spread_map = new HashMap<Object, GeoScore>();
         // Prepare a list of batches to process later on, if we would need to
-        // process too many tags. We cannot track x/y for all tags in that case
+        // process too many features. We cannot track x/y for all features in 
+        // that case
         List<Set<Object>> additional_batches = new ArrayList<Set<Object>>();
-        // Tracking stats of the tags
+        // Tracking stats of the features
         List<HashMap<CellPoint,Integer>> tmpstats = null;
         int counter = 0;
         int lines = 0;
@@ -199,7 +208,7 @@ public class GeoSpreadFeatureRanker {
             if (limit > 0 && limit < lines)
                 lines = limit;
             
-            // Prepare the superset of unique tags we have seen so far
+            // Prepare the superset of unique features we have seen so far
             Set<Object> superset = new HashSet<Object>(lines);
             // The current batch of data to process next
             Set<Object> batch = new HashSet<Object>();
@@ -211,7 +220,8 @@ public class GeoSpreadFeatureRanker {
             tmpstats = new ArrayList<HashMap<CellPoint,Integer>>(lines);
             
             System.out.println("Reading and parsing lines from datafile: " + 
-                    (limit > 0 && limit < lines ? limit + " ++ LIMITED BY VARIABLE ++" : lines));
+                    (limit > 0 && limit < lines ? limit + 
+                    " ++ LIMITED BY VARIABLE ++" : lines));
             // Read the training data
             BufferedReader in = new BufferedReader(new FileReader(inputFile));
             String line = in.readLine();
@@ -225,39 +235,47 @@ public class GeoSpreadFeatureRanker {
                     double lon = item.getLongitude();
                 
                     // Determine cell values
-                    int stat_x = Math.min((int)(Math.floor(lat + 90) * scale_rows), grid_x - 1);
-                    int stat_y = Math.min((int)(Math.floor(lon + 180)* scale_columns), grid_y - 1);
+                    int stat_x = Math.min((int)(Math.floor(lat + 90) * 
+                            scale_rows), grid_x - 1);
+                    int stat_y = Math.min((int)(Math.floor(lon + 180)* 
+                            scale_columns), grid_y - 1);
                     // Fetch the item payload
                     String [] data = (String[])item.getData();
-                    // If there are tags
+                    // If there are features
                     if (data.length > 0) {
-                        // Process each of the tags
-                        for (String tag : data) {
+                        // Process each of the features
+                        for (String feature : data) {
                             // If the feature is to be processed
-                            if (tag.trim().length() > 0 && !tag.trim().equals("\t")) {
+                            if (feature.trim().length() > 0 && 
+                                    !feature.trim().equals("\t")) {
                                 // Add to the overall spread map
-                                Integer id = this.feature_id.get(tag);
-                                // Only allow new tags below the limit
-                                if (id == null && this.feature_id.size() < batch_limit) {
-                                    // Keep track of the tag in the superset
-                                    superset.add(tag);
+                                Integer id = this.feature_id.get(feature);
+                                // Only allow new features below the limit
+                                if (id == null && 
+                                        this.feature_id.size() < batch_limit) {
+                                    // Keep track of the feature in the superset
+                                    superset.add(feature);
                                     id = feature_id.size();
-                                    this.feature_id.put(tag, id);
-                                    this.id_feature.put(id, tag);
+                                    this.feature_id.put(feature, id);
+                                    this.id_feature.put(id, feature);
                                 }
-                                // Process if we have an id - which means it is in the current batch
+                                // Process if we have an id - which means it is
+                                // in the current batch
                                 if (id != null) {
                                     // Determine the cellpoint
-                                    CellPoint cp = new CellPoint(stat_x, stat_y);
+                                    CellPoint cp = new CellPoint(stat_x, 
+                                            stat_y);
 
                                     HashMap<CellPoint, Integer> map;
-                                    // If we have not seen any stats so far for this id
+                                    // If we have not seen any stats so far for 
+                                    // this id
                                     if (tmpstats.size() <= id) {
                                         map = new HashMap<CellPoint, Integer>();
                                         tmpstats.add(map);
                                     }
                                     else
-                                        // We can fetch the stats for this tag
+                                        // We can fetch the stats for this 
+                                        // feature
                                         map = tmpstats.get(id);
                                     // Fetch the current count
                                     Integer count = map.get(cp);
@@ -270,10 +288,10 @@ public class GeoSpreadFeatureRanker {
                                 }
                                 // Id is to high, has to go to the next batch
                                 else {
-                                    // New tag
-                                    if (!superset.contains(tag)) {
-                                        superset.add(tag);
-                                        batch.add(tag);
+                                    // New feature
+                                    if (!superset.contains(feature)) {
+                                        superset.add(feature);
+                                        batch.add(feature);
                                     }
                                     // If the batch is full
                                     if (batch.size() == batch_limit) {
@@ -292,8 +310,8 @@ public class GeoSpreadFeatureRanker {
                         // Print time, total unique features so far, and the 
                         // number of batches it will take to process them
                         System.out.println("-> " + counter + "\tTime: " + 
-                                (stop-start) + "\tFeatures: " + superset.size() + 
-                                " ("+(superset.size()/batch_limit) + ")");
+                                (stop-start) + "\tFeatures: " + superset.size() 
+                                + " ("+(superset.size()/batch_limit) + ")");
                         start = System.currentTimeMillis();
                     }
                 }
@@ -316,9 +334,9 @@ public class GeoSpreadFeatureRanker {
             System.err.println("IOException: " + e.getMessage());
             System.exit(1);
         }
-        // At this point, we have tracked all tags for the current batch
+        // At this point, we have tracked all features for the current batch
         
-        // So we can calculate the actual scores for the tracked tags
+        // So we can calculate the actual scores for the tracked features
         calculateScores(tmpstats, spread_map, additional_batches.size());
         
         /*
@@ -332,10 +350,14 @@ public class GeoSpreadFeatureRanker {
         for (Set<Object> current_batch : additional_batches) {
             try {
                 batchcounter++;
-                BufferedReader in = new BufferedReader(new FileReader(inputFile));
-                System.out.println("//========================================\\\\");
-                System.out.println("\tExtra batch " + batchcounter + "/" + additional_batches.size());
-                System.out.println("\\\\========================================//");
+                BufferedReader in = new BufferedReader(
+                        new FileReader(inputFile));
+                System.out.println("//========================================"
+                        + "\\\\");
+                System.out.println("\tExtra batch " + batchcounter + "/" + 
+                        additional_batches.size());
+                System.out.println("\\\\======================================"
+                        + "==//");
                 counter = 0;
                 // Prepare tools for this batch
                 this.feature_id = new HashMap<Object, Integer>(batch_limit);
@@ -351,24 +373,28 @@ public class GeoSpreadFeatureRanker {
                         double lon = item.getLongitude();
 
                         // Determine cell values
-                        int stat_x = Math.min((int)(Math.floor(lat + 90) * scale_rows), grid_x - 1);
-                        int stat_y = Math.min((int)(Math.floor(lon + 180)* scale_columns), grid_y - 1);
+                        int stat_x = Math.min((int)(Math.floor(lat + 90) * 
+                                scale_rows), grid_x - 1);
+                        int stat_y = Math.min((int)(Math.floor(lon + 180)* 
+                                scale_columns), grid_y - 1);
                                                 
                         String [] data = (String[])item.getData();
                         if (data.length > 0) {
-                            for (String tag : data) {
+                            for (String feature : data) {
                                 // If the feature is to be processed
-                                if (tag.trim().length() > 0 && !tag.trim().equals("\t") 
-                                        && current_batch.contains(tag)) {
+                                if (feature.trim().length() > 0 && 
+                                        !feature.trim().equals("\t") 
+                                        && current_batch.contains(feature)) {
                                     // Add to the overall spread map
-                                    Integer id = this.feature_id.get(tag);
+                                    Integer id = this.feature_id.get(feature);
                                     if (id == null) {
                                         id = feature_id.size();
-                                        this.feature_id.put(tag, id);
-                                        this.id_feature.put(id, tag);
+                                        this.feature_id.put(feature, id);
+                                        this.id_feature.put(id, feature);
                                     }
 
-                                    CellPoint cp = new CellPoint(stat_x, stat_y);
+                                    CellPoint cp = new CellPoint(stat_x, 
+                                            stat_y);
 
                                     HashMap<CellPoint, Integer> map = null;
                                     if (tmpstats.size() <= id) {
@@ -389,7 +415,8 @@ public class GeoSpreadFeatureRanker {
                         counter++;
                         if (counter % REPORT_SIZE_LOAD == 0) {
                             long stop = System.currentTimeMillis();
-                            System.out.println("-> " + counter + "\tTime: " + (stop-start));
+                            System.out.println("-> " + counter + "\tTime: " + 
+                                    (stop-start));
                             start = System.currentTimeMillis();
                         }
                     }
@@ -403,8 +430,9 @@ public class GeoSpreadFeatureRanker {
                 System.err.println("IOException: " + e.getMessage());
                 System.exit(1);
             }
-            // Again, at this point, we have tracked all tags for the current batch
-            // So we can calculate the actual scores for the tracked tags
+            // Again, at this point, we have tracked all features for the 
+            // current batch. So we can calculate the actual scores for the 
+            // tracked features
             calculateScores(tmpstats, spread_map, additional_batches.size());
         }
         
@@ -422,29 +450,39 @@ public class GeoSpreadFeatureRanker {
     }
     
     /**
-     * Helper method that converts tag tracking in cells to actual spread scores.
-     * @param tmpstats The stats (x,y occurrences) for the tags in the current batch
-     * @param spread_map The map that should contain the results of tag, geoscore pairs
-     * @param batches_to_follow The number of batches that follow, just for output purposes
+     * Helper method that converts feature tracking in cells to actual spread 
+     * scores.
+     * @param tmpstats The stats (x,y occurrences) for the features in the 
+     * current batch
+     * @param spread_map The map that should contain the results of feature, 
+     * geoscore pairs
+     * @param batches_to_follow The number of batches that follow, just for 
+     * output purposes
      */
     private void calculateScores(List<HashMap<CellPoint,Integer>> tmpstats, 
             Map<Object, GeoScore> spread_map, int batches_to_follow) {
-        // Convert tmpstats to an array - for multi-threaded accessing without locking
+        // Convert tmpstats to an array - for multi-threaded accessing without 
+        // locking
         this.stats = tmpstats.toArray(new HashMap[0]);
         
-        System.out.println("Total features: " + this.feature_id.keySet().size());
+        System.out.println("Total features: " +this.feature_id.keySet().size());
         // Notify how many batches will follow
         if(batches_to_follow > 0)
-            System.out.println(" - will process " + batches_to_follow + " more batches...");
+            System.out.println(" - will process " + batches_to_follow + 
+                    " more batches...");
 
         // Create an executor service and process things with multiple threads
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
-        List<Future<Map<Object, GeoScore>>> list = new ArrayList<Future<Map<Object, GeoScore>>>();
-        // Schedule the threads to process the current stats, 'thread_batch_size' a time
-        for (int begin = 0; begin < this.stats.length; begin += thread_batch_size) {
+        List<Future<Map<Object, GeoScore>>> list = 
+                new ArrayList<Future<Map<Object, GeoScore>>>();
+        // Schedule the threads to process the current stats, 
+        // 'thread_batch_size' a time
+        for (int begin = 0; begin < this.stats.length; 
+                begin += thread_batch_size) {
             int end = Math.min(begin + thread_batch_size, this.stats.length);
             // Queue the helpers, track the futures, execute
-            Callable<Map<Object, GeoScore>> worker = new GeoSpreadCalculatorHelper(begin, end);
+            Callable<Map<Object, GeoScore>> worker = 
+                    new GeoSpreadCalculatorHelper(begin, end);
             Future<Map<Object, GeoScore>> submit = executor.submit(worker);
             list.add(submit);
         }
@@ -454,18 +492,19 @@ public class GeoSpreadFeatureRanker {
             try {
                 // Get the map with the results local to the Callable
                 Map<Object, GeoScore> local_map = future.get();
-                // For each of those tags
-                for (Object tagid : local_map.keySet()) {
+                // For each of those features
+                for (Object featureid : local_map.keySet()) {
                     // Resolve the id
-                    Object tag = this.id_feature.get((Integer)tagid);
+                    Object feature = this.id_feature.get((Integer)featureid);
                     // Sanity check
-                    if (!((String)tag).equals(""))
+                    if (!((String)feature).equals(""))
                         // put the score in the spread map
-                        spread_map.put(tag, local_map.get(tagid));
+                        spread_map.put(feature, local_map.get(featureid));
                 }
                 resultcounter++;
                 // Report progress as needed
-                if ((resultcounter * thread_batch_size) % REPORT_SIZE_PROCESS == 0)
+                if ((resultcounter * thread_batch_size) % 
+                        REPORT_SIZE_PROCESS == 0)
                     System.out.println((resultcounter * thread_batch_size));
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -483,7 +522,8 @@ public class GeoSpreadFeatureRanker {
     /**
      * Private helper class (Callable) for multi-threaded processing
      */
-    private class GeoSpreadCalculatorHelper implements Callable<Map<Object, GeoScore>>{
+    private class GeoSpreadCalculatorHelper 
+        implements Callable<Map<Object, GeoScore>>{
 
         /**
          * Start index.
@@ -505,7 +545,8 @@ public class GeoSpreadFeatureRanker {
 
         /**
          * Actual spread calculation.
-         * @return a map containing the processed tags and their spread scores
+         * @return a map containing the processed features and their spread 
+         * scores
          * @throws Exception
          */
         @Override
@@ -521,15 +562,15 @@ public class GeoSpreadFeatureRanker {
         
         /**
          * Actual spread score calculation
-         * @param tag Tag to process
+         * @param feature Feature to process
          * @return a double value with the geographic spread score
          */
-        private GeoScore calculateSpreadScore(int tagid) {
+        private GeoScore calculateSpreadScore(int featureid) {
             // Init a list of clusters that have a non-zero occurence count
             List<Cluster> clusters = new ArrayList<Cluster>();
-            Map<CellPoint, Integer> tagOccurences = stats[tagid];
-            for (CellPoint cp : tagOccurences.keySet()) {
-                int count = tagOccurences.get(cp);
+            Map<CellPoint, Integer> featureOccurences = stats[featureid];
+            for (CellPoint cp : featureOccurences.keySet()) {
+                int count = featureOccurences.get(cp);
                 clusters.add(new Cluster(cp, count));
             }
             boolean changed = true;
@@ -537,15 +578,18 @@ public class GeoSpreadFeatureRanker {
             while (changed) {
                 changed = false;
                 List<Cluster> clustera_copy = new ArrayList<Cluster>(clusters);
-                // Init a list of invalidated clusters that can no longer be used
+                // Init a list of invalidated clusters that can no longer be 
+                // used
                 Set<Cluster> invalidated = new HashSet<Cluster>();
                 for (Cluster cluster_a : clustera_copy) {
                     // If it is a valid cluster
                     if (!invalidated.contains(cluster_a)) {
-                        List<Cluster> clusterb_copy = new ArrayList<Cluster>(clusters);
+                        List<Cluster> clusterb_copy = 
+                                new ArrayList<Cluster>(clusters);
                         for (Cluster cluster_b : clusterb_copy) {
                             // If the clusters a and b are 'connected'
-                            if (cluster_a != cluster_b && cluster_a.isConnected(cluster_b)) {
+                            if (cluster_a != cluster_b && 
+                                    cluster_a.isConnected(cluster_b)) {
                                 // Merge them
                                 cluster_a.merge(cluster_b);
                                 // Remove b
@@ -574,8 +618,8 @@ public class GeoSpreadFeatureRanker {
     
     /**
      * Helper class representing a geoscore. This object contains the number of 
-     * connected individual components involved, the max count over the components
-     * and the actual score.
+     * connected individual components involved, the max count over the 
+     * components and the actual score.
      */
     private class GeoScore implements Comparable<GeoScore> {
         
@@ -585,7 +629,7 @@ public class GeoSpreadFeatureRanker {
         private int components;
         
         /**
-         * The maximum tag count found in one of the components.
+         * The maximum feature count found in one of the components.
          */
         private int maxcount;
         
@@ -597,7 +641,8 @@ public class GeoSpreadFeatureRanker {
         /**
          * Constructor.
          * @param components the number of interconnected components
-         * @param maxcount the maximum tag count found in one of the components
+         * @param maxcount the maximum feature count found in one of the 
+         * components
          * @param score the actual geospread score
          */
         public GeoScore(int components, int maxcount, double score) {
@@ -621,7 +666,8 @@ public class GeoSpreadFeatureRanker {
             if (this.maxcount != other.maxcount) {
                 return false;
             }
-            if (Double.doubleToLongBits(this.score) != Double.doubleToLongBits(other.score)) {
+            if (Double.doubleToLongBits(this.score) != 
+                    Double.doubleToLongBits(other.score)) {
                 return false;
             }
             return true;
@@ -632,7 +678,8 @@ public class GeoSpreadFeatureRanker {
             int hash = 7;
             hash = 29 * hash + this.components;
             hash = 29 * hash + this.maxcount;
-            hash = 29 * hash + (int) (Double.doubleToLongBits(this.score) ^ (Double.doubleToLongBits(this.score) >>> 32));
+            hash = 29 * hash + (int) (Double.doubleToLongBits(this.score) ^ 
+                    (Double.doubleToLongBits(this.score) >>> 32));
             return hash;
         }
         
@@ -651,7 +698,8 @@ public class GeoSpreadFeatureRanker {
          */
         @Override
         public String toString() {
-            return "GeoScore{" + "components=" + components + ", maxcount=" + maxcount + ", score=" + score + '}';
+            return "GeoScore{" + "components=" + components + ", maxcount=" + 
+                    maxcount + ", score=" + score + '}';
         }
     }
 
@@ -661,7 +709,7 @@ public class GeoSpreadFeatureRanker {
     private class Cluster {
 
         /**
-         * Occurrences of a tag in this cluster.
+         * Occurrences of a feature in this cluster.
          */
         private int count;
 
@@ -725,14 +773,22 @@ public class GeoSpreadFeatureRanker {
                           break;
                         // Are they on 1 of 8 sides connected
                         case MERGE_DIAGONAL:
-                          if (cellPointOther.x == cellPoint.x - 1 && cellPointOther.y == cellPoint.y - 1 ||
-                            cellPointOther.x == cellPoint.x - 1 && cellPointOther.y == cellPoint.y ||
-                            cellPointOther.x == cellPoint.x - 1 && cellPointOther.y == cellPoint.y + 1 ||
-                            cellPointOther.x == cellPoint.x  && cellPointOther.y == cellPoint.y - 1 ||
-                            cellPointOther.x == cellPoint.x  && cellPointOther.y == cellPoint.y + 1 ||
-                            cellPointOther.x == cellPoint.x + 1 && cellPointOther.y == cellPoint.y - 1 ||
-                            cellPointOther.x == cellPoint.x + 1 && cellPointOther.y == cellPoint.y ||
-                            cellPointOther.x == cellPoint.x + 1 && cellPointOther.y == cellPoint.y + 1
+                          if (cellPointOther.x == cellPoint.x - 1 && 
+                                  cellPointOther.y == cellPoint.y - 1 ||
+                            cellPointOther.x == cellPoint.x - 1 && 
+                                  cellPointOther.y == cellPoint.y ||
+                            cellPointOther.x == cellPoint.x - 1 && 
+                                  cellPointOther.y == cellPoint.y + 1 ||
+                            cellPointOther.x == cellPoint.x  && 
+                                  cellPointOther.y == cellPoint.y - 1 ||
+                            cellPointOther.x == cellPoint.x  && 
+                                  cellPointOther.y == cellPoint.y + 1 ||
+                            cellPointOther.x == cellPoint.x + 1 && 
+                                  cellPointOther.y == cellPoint.y - 1 ||
+                            cellPointOther.x == cellPoint.x + 1 && 
+                                  cellPointOther.y == cellPoint.y ||
+                            cellPointOther.x == cellPoint.x + 1 && 
+                                  cellPointOther.y == cellPoint.y + 1
                           ) {
                               return true;
                           }
@@ -756,7 +812,8 @@ public class GeoSpreadFeatureRanker {
             if (this.count != other.count) {
                 return false;
             }
-            if (this.cellpoints != other.cellpoints && (this.cellpoints == null || !this.cellpoints.equals(other.cellpoints))) {
+            if (this.cellpoints != other.cellpoints && (this.cellpoints == null 
+                    || !this.cellpoints.equals(other.cellpoints))) {
                 return false;
             }
             return true;
@@ -766,7 +823,8 @@ public class GeoSpreadFeatureRanker {
         public int hashCode() {
             int hash = 7;
             hash = 67 * hash + this.count;
-            hash = 67 * hash + (this.cellpoints != null ? this.cellpoints.hashCode() : 0);
+            hash = 67 * hash + (this.cellpoints != null ? 
+                    this.cellpoints.hashCode() : 0);
             return hash;
         }
 

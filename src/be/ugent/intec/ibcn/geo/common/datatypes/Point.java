@@ -145,9 +145,11 @@ public class Point {
      * @return The distance between this Point and the Point q
      */
     public double distanceDefault(Point q) {
-        double px = longitude * DEGREE_LATITUDE_KM * Math.cos(latitude*(Math.PI/180));
+        double px = longitude * DEGREE_LATITUDE_KM * Math.cos(latitude*(
+                Math.PI/180));
         double py = latitude * DEGREE_LATITUDE_KM;
-        double qx = q.longitude * DEGREE_LATITUDE_KM * Math.cos(q.latitude*(Math.PI/180));
+        double qx = q.longitude * DEGREE_LATITUDE_KM * Math.cos(q.latitude*(
+                Math.PI/180));
         double qy = q.latitude * DEGREE_LATITUDE_KM;
         return Math.sqrt(Math.pow((px - qx), 2) + Math.pow((py - qy), 2));
     }
@@ -179,10 +181,10 @@ public class Point {
 
         double delta_lambda = q_lambda - p_lambda;
         double v1 = Math.cos(q_phi) * Math.sin(delta_lambda);
-        double v2 = Math.cos(p_phi) * Math.sin(q_phi) -
-                                Math.sin(p_phi) * Math.cos(q_phi) * Math.cos(delta_lambda);
-        double v3 = Math.sin(p_phi) * Math.sin(q_phi) +
-                                Math.cos(p_phi) * Math.cos(q_phi) * Math.cos(delta_lambda);
+        double v2 = Math.cos(p_phi) * Math.sin(q_phi) - Math.sin(p_phi) * 
+                Math.cos(q_phi) * Math.cos(delta_lambda);
+        double v3 = Math.sin(p_phi) * Math.sin(q_phi) + Math.cos(p_phi) * 
+                Math.cos(q_phi) * Math.cos(delta_lambda);
         double angularDifference = Math.atan2(Math.sqrt(v1*v1 + v2*v2), v3);
         return angularDifference * EARTH_R;
     }

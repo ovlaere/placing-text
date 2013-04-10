@@ -63,7 +63,8 @@ public class PamParameters extends ClusteringParameters {
      * @param merge_cluster_below_threshold if the clusters should be merged 
      * when their size drops below the minimum cluster size.
      */
-    public void setMerge_cluster_below_threshold(boolean merge_cluster_below_threshold) {
+    public void setMerge_cluster_below_threshold(
+            boolean merge_cluster_below_threshold) {
         this.merge_cluster_below_threshold = merge_cluster_below_threshold;
     }
 }

@@ -7,8 +7,10 @@ import java.util.*;
  * Calculate the Jaccard Similarity.
  * 
  * For details on the Jaccard measure
- *  @see http://en.wikipedia.org/wiki/Jaccard_index
- *  @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0140
+ * @see http://en.wikipedia.org/wiki/Jaccard_index
+ * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0140
+ * 
+ * @see SimilarItem
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
@@ -48,7 +50,8 @@ public class Similarity {
      * @return A Sorted Set (descencing order of similarity scores) of the
      * 'items_to_retain' most similar DataItems to the given DataItem 'item'.
      */
-    public static SortedSet<SimilarItem> jaccard(DataItem [] items, DataItem item, int items_to_retain) {
+    public static SortedSet<SimilarItem> jaccard(DataItem [] items, 
+            DataItem item, int items_to_retain) {
         // Prepare a sorted set
         SortedSet<SimilarItem> similar_items = new TreeSet<SimilarItem>();
         // For each of the items to consider
@@ -56,7 +59,8 @@ public class Similarity {
             // Sanity check
             if (items[i] != null) {
                 // Create the SimilarItem
-                SimilarItem simitem = new SimilarItem(items[i], Similarity.jaccard(item, items[i]));
+                SimilarItem simitem = new SimilarItem(items[i], 
+                        Similarity.jaccard(item, items[i]));
                 // Only add if this item will for sure be in the set
                 if (similar_items.size() < items_to_retain || 
                         simitem.getScore() >= similar_items.last().getScore()) {

@@ -20,13 +20,15 @@ import java.util.concurrent.*;
  * WARNING: This code might break if run on a training file with more than 
  * 16M-32M training items.
  * 
+ * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class SimilarityIndexer {
 
     /**
      * Constant containing the number of processors available in the system.
      */
-    protected static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    protected static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
 
     /**
      * Constant holding the number of lines to read for each thread burst.
@@ -122,7 +124,8 @@ public class SimilarityIndexer {
             // Fetch the number of lines to process
             int lines = FileIO.getNumberOfLines(parameters.getTrainingFile());
             // Determine the number of lines to process in case a limit was set
-            if (parameters.getTrainingLimit() > 0 && parameters.getTrainingLimit() < lines) {
+            if (parameters.getTrainingLimit() > 0 && 
+                    parameters.getTrainingLimit() < lines) {
                 lines = parameters.getTrainingLimit();
             }
             this.linelimit = lines;
@@ -135,20 +138,21 @@ public class SimilarityIndexer {
             // Prepare a thread pool
             ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
             // Prepare a list for the futures
-            List<Future<SimIndexHelperResult>> list = new ArrayList<Future<SimIndexHelperResult>>();
+            List<Future<SimIndexHelperResult>> list = 
+                    new ArrayList<Future<SimIndexHelperResult>>();
             // For each of the lines to process, start working in bursts
             for (int start = 0; start < lines; start += READ_BURST) {
                 // Create callable, track future, submit
                 Callable<SimIndexHelperResult> worker = 
                         new SimIndexerHelper(in, start, 
                         Math.min(lines-start, READ_BURST), 
-                        // Using this the used_classIds, you can restrict indexing
-                        // to the used classes only, but if the classification
-                        // result changes, the indexing needs to be redone
+                    // Using this the used_classIds, you can restrict indexing
+                    // to the used classes only, but if the classification
+                    // result changes, the indexing needs to be redone
 //                        new HashSet<Integer>(used_classIds));
-                        // When setting the used_classes to null, all classes
-                        // will be indexed. The similarity index only needs
-                        // to be rebuild when a new clustering is used.
+                    // When setting the used_classes to null, all classes
+                    // will be indexed. The similarity index only needs
+                    // to be rebuild when a new clustering is used.
                         null);
                 Future<SimIndexHelperResult> submit = executor.submit(worker);
                 list.add(submit);
@@ -171,8 +175,8 @@ public class SimilarityIndexer {
                             count = 0;
                         // Gather the actual item count - this is used to write
                         // at the top of the index files.
-                        class_count_map.put(classId, 
-                                count + result.getClass_count_map().get(classId));
+                        class_count_map.put(classId, count + 
+                                result.getClass_count_map().get(classId));
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -188,7 +192,8 @@ public class SimilarityIndexer {
             // Close the input
             in.close();
             // Report some stats
-            System.out.println("Scan time: " + (System.currentTimeMillis() - t1) + 
+            System.out.println("Scan time: " + 
+                    (System.currentTimeMillis() - t1) + 
                     ", training items in classes: " + line_class_map.size());
         }
         catch (IOException e) {
@@ -217,7 +222,8 @@ public class SimilarityIndexer {
             Set<Integer> classesInCurrentBatch = new HashSet<Integer>();
             try {
                 // Create a map to track the filewriters
-                Map<Integer, PrintWriter> classId_writer_map = new HashMap<Integer, PrintWriter>();
+                Map<Integer, PrintWriter> classId_writer_map = 
+                        new HashMap<Integer, PrintWriter>();
                 for (int classId : class_count_map.keySet()) {
                     if (classId_writer_map.size() < open_file_limit) {
                         // Batch dir
@@ -228,7 +234,7 @@ public class SimilarityIndexer {
                         dirtest.mkdirs();
                         // Open the writer for the index for the given classId
                         PrintWriter out = new PrintWriter(
-                                new FileWriter(getIndexFile(parameters, classId)));
+                            new FileWriter(getIndexFile(parameters, classId)));
                         // Start the file with the number of items in the class
                         out.println(class_count_map.get(classId));
                         // Store a reference to the writer
@@ -240,8 +246,8 @@ public class SimilarityIndexer {
                 // Read the input data
                 BufferedReader in = new BufferedReader(
                         new FileReader(parameters.getTrainingFile()));
-                // skip the line count - this might loose an item if the file did
-                // not contain that info on the first line.
+                // skip the line count - this might loose an item if the file 
+                // did not contain that info on the first line.
                 in.readLine(); 
                 // Set the overall linenumber
                 linenumber = 2;
@@ -251,7 +257,8 @@ public class SimilarityIndexer {
                     // Fetch the class assignment for this line number
                     Integer classId = line_class_map.get(linenumber);
                     // If we the class is in this batch
-                    if (classId != null && classesInCurrentBatch.contains(classId)) {
+                    if (classId != null && 
+                            classesInCurrentBatch.contains(classId)) {
                         // write the line to the file
                         classId_writer_map.get(classId).println(line);
                     }
@@ -328,7 +335,8 @@ public class SimilarityIndexer {
          * @param burst Length of the burst this callable processes
          * @param used_classIds Copy of the classIDs used by the classifier
          */
-        public SimIndexerHelper(BufferedReader file, int start, int burst, Set<Integer> used_classIds) {
+        public SimIndexerHelper(BufferedReader file, int start, int burst, 
+                Set<Integer> used_classIds) {
             this.file = file;
             this.start = start;
             this.burst = burst;
@@ -345,12 +353,15 @@ public class SimilarityIndexer {
         @Override
         public SimIndexHelperResult call() throws Exception {
             // Prepare local map
-            Map<Integer, Integer> line_class_map = new HashMap<Integer, Integer>();
-            Map<Integer, Integer> class_count_map = new HashMap<Integer, Integer>();
+            Map<Integer, Integer> line_class_map = 
+                    new HashMap<Integer, Integer>();
+            Map<Integer, Integer> class_count_map = 
+                    new HashMap<Integer, Integer>();
             List<String> data = new ArrayList<String>();
             try {
                 // Get the parser
-                LineParser parser = Util.getParser(parameters.getTrainingParser());
+                LineParser parser = 
+                        Util.getParser(parameters.getTrainingParser());
                 // Track the local number of lines
                 int currentlinenumber;
                 // Try to get a lock on the input data
@@ -368,17 +379,20 @@ public class SimilarityIndexer {
                     }
                     // While there are lines, we are in our burst and we are
                     // within the global line limit
-                    while (line != null && ++counter < burst && counter < linelimit);
+                    while (line != null && ++counter < burst && 
+                            counter < linelimit);
                 }
                 // Now, for our local line cache, process the lines
                 for (String current_line : data) {
                     Point item = parser.parse(current_line);
-                    // If we have an item with tags
+                    // If we have an item with features
                     if (item != null) {
                         // Fetch the class ID by on the fly assignment
-                        int classId = parameters.getClassMapper().findClass(item).getId();
+                        int classId = parameters.getClassMapper().
+                                findClass(item).getId();
                         // If this class is actually used by the classifier
-                        if (used_classIds == null || used_classIds.contains(classId)){
+                        if (used_classIds == null || 
+                                used_classIds.contains(classId)){
                             // Store the class assignment
                             line_class_map.put(currentlinenumber, classId);
                             // Manage the item count in this class
@@ -443,10 +457,12 @@ public class SimilarityIndexer {
 
         /**
          * Constructor.
-         * @param line_class_map a map with line numbers - class assignment pairs
+         * @param line_class_map a map with line numbers - class assignment 
+         * pairs
          * @param class_count_map a map with class - item count pairs 
          */
-        public SimIndexHelperResult(Map<Integer, Integer> line_class_map, Map<Integer, Integer> class_count_map) {
+        public SimIndexHelperResult(Map<Integer, Integer> line_class_map, 
+                Map<Integer, Integer> class_count_map) {
             this.line_class_map = line_class_map;
             this.class_count_map = class_count_map;
         }

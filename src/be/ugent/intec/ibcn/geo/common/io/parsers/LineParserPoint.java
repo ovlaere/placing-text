@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 /**
  * Default abstract parser definition.
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public abstract class LineParserPoint implements LineParser {

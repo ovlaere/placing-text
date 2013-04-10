@@ -22,7 +22,8 @@ public class Util {
 
             @Override
             public int compare(Object o1, Object o2) {
-                return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue()) * -1;
+                return ((Comparable) ((Map.Entry) (o1)).getValue()).
+                        compareTo(((Map.Entry) (o2)).getValue()) * -1;
             }
         });
         Map result = new LinkedHashMap();
@@ -45,10 +46,13 @@ public class Util {
 
             @Override
             public int compare(Object o1, Object o2) {
-                if (((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue()) == 0)
-                    return ((Comparable) ((Map.Entry) (o1)).getKey()).compareTo(((Map.Entry) (o2)).getKey());
+                if (((Comparable) ((Map.Entry) (o1)).getValue()).
+                        compareTo(((Map.Entry) (o2)).getValue()) == 0)
+                    return ((Comparable) ((Map.Entry) (o1)).getKey()).
+                            compareTo(((Map.Entry) (o2)).getKey());
                 else
-                    return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
+                    return ((Comparable) ((Map.Entry) (o1)).getValue()).
+                            compareTo(((Map.Entry) (o2)).getValue());
             }
         });
         Map result = new LinkedHashMap();
@@ -77,9 +81,10 @@ public class Util {
     }
     
     /**
-     * Helper method that instantiates a input parser given a certain implementation.
-     * @param parserClassName full package and class name of the parser implementation
-     * to use.
+     * Helper method that instantiates a input parser given a certain 
+     * implementation.
+     * @param parserClassName full package and class name of the parser 
+     * implementation to use.
      * @return An instance of the specified parser. 
      */
     public static LineParser getParser(String parserClassName) {
@@ -100,7 +105,8 @@ public class Util {
         }
         // If parser is null
         if (parser == null) {
-            throw new RuntimeException("Parser is null. This should not happen at this point!");
+            throw new RuntimeException(
+                    "Parser is null. This should not happen at this point!");
         }
         return parser;
     }

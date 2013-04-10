@@ -31,7 +31,7 @@ public class LineParserTrainingSimilarity extends LineParserPoint
     /**
      * Actual parse implementation.
      * @param line The String input line from file
-     * @return An instantiated DataItem or null if no tags were present
+     * @return An instantiated DataItem or null if no features were present
      */
     @Override
     public DataItem parse(String line) {
@@ -43,9 +43,9 @@ public class LineParserTrainingSimilarity extends LineParserPoint
             int id = Integer.parseInt(values[0]);
             double lat = Double.parseDouble(values[2]);
             double lon = Double.parseDouble(values[3]);
-            // Split the tags
+            // Split the features
             String [] data = pattern_space.split(values[4]);
-            // Prevent empty tags
+            // Prevent empty features
             if (data.length == 1 && data[0].equals(""))
                 data = new String[0];
             // If there are features
@@ -55,7 +55,8 @@ public class LineParserTrainingSimilarity extends LineParserPoint
                     item = new DataItem(id, lat, lon, data);
                 else {
                     boolean hit = false;
-                    // Search for at least 1 tag in common with the featureset
+                    // Search for at least 1 feature in common with the 
+                    // featureset
                     for (Object f : data) {
                         if (filter.contains((String)f)) {
                             hit = true;

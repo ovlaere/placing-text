@@ -4,16 +4,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class represents the concept of a cluster (/area/class) under the generic
- * name of GeoClass. Every training item can belong to one of the possible classes.
+ * This class represents the concept of a cluster (/area/class) under the 
+ * generic name of GeoClass. Every training item can belong to one of the 
+ * possible classes.
  * 
  * A class is represented by a medoid, which is normally determined by some
- * clustering algorithm. The medoid is identified by its unique ID in the training
- * data. This id is remapped on the fly by the ClassMapperOnline class. This
- * facilitates indexing and retrieval in array structures of the different classes
- * without loosing the link to the original medoid points in the training data.
- * 
- * @see be.ugent.intec.ugent.ibcn.geo.common.ClassMapperOnline
+ * clustering algorithm. The medoid is identified by its unique ID in the 
+ * training data. This id is remapped on the fly by the ClassMapperOnline class.
+ * This facilitates indexing and retrieval in array structures of the different 
+ * classes without loosing the link to the original medoid points in the 
+ * training data.
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */

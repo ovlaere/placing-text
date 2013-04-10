@@ -8,12 +8,12 @@ import java.util.List;
 /**
  * Default implementation for reading input data for training.
  * 
- * AbstractLineParserDataItem provides a Map of features to map the tags
+ * AbstractLineParserDataItem provides a Map of features to map the features
  * to IDs. Input data is converted to DataItem objects with ID, lat, lon
- * and an Object [] of tags (by means of numeric IDs) after loading.
+ * and an Object [] of features (by means of numeric IDs) after loading.
  * 
- * If the item has no tags, it is discarded and null is returned. Please note
- * that we cannot do this for test!
+ * If the item has no features, it is discarded and null is returned. 
+ * Please note that we cannot do this for test!
  * 
  * @see AbstractLineParserDataItem
  * 
@@ -31,7 +31,7 @@ public class LineParserTrainingItem extends AbstractLineParserDataItem{
     /**
      * Actual parse implementation.
      * @param line The String input line from file
-     * @return An instantiated DataItem or null if no tags were present
+     * @return An instantiated DataItem or null if no features were present
      */
     @Override
     public DataItem parse(String line) {
@@ -43,9 +43,9 @@ public class LineParserTrainingItem extends AbstractLineParserDataItem{
             int id = Integer.parseInt(values[0]);
             double lat = Double.parseDouble(values[2]);
             double lon = Double.parseDouble(values[3]);
-            // Split the tags
+            // Split the features
             String [] data = pattern_space.split(values[4]);
-            // Prevent empty tags
+            // Prevent empty features
             if (data.length == 1 && data[0].equals(""))
                 data = new String[0];
 
@@ -58,9 +58,10 @@ public class LineParserTrainingItem extends AbstractLineParserDataItem{
                 for (String s : data)
                     if (features.containsKey(s))
                         newdata.add(features.get(s));
-                // If there are tags
+                // If there are features
                 if (newdata.size() > 0) {
-                    item = new DataItem(id, lat, lon, newdata.toArray(new Integer[0]));
+                    item = new DataItem(id, lat, lon, newdata.toArray(
+                            new Integer[0]));
                 }
             }
             // Sanity check

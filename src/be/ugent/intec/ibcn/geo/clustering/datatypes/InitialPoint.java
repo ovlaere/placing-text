@@ -14,7 +14,7 @@ import be.ugent.intec.ibcn.geo.common.datatypes.Point;
  * 
  * @see PamClustering
  * 
- * @author ovlaere
+ * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class InitialPoint extends Point{
 
@@ -72,7 +72,8 @@ public class InitialPoint extends Point{
     }
 
     /**
-     * @return A String representation of this cluster, with some added statistics.
+     * @return A String representation of this cluster, with some added 
+     * statistics.
      */
     @Override
     public String toString() {

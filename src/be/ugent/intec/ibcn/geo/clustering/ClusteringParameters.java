@@ -18,7 +18,8 @@ public class ClusteringParameters {
      * Set the iteration limit for the cluster optimization process.
      * @param optimization_iteration_limit 
      */
-    public void setOptimization_iteration_limit(int optimization_iteration_limit) {
+    public void setOptimization_iteration_limit(
+            int optimization_iteration_limit) {
         this.optimization_iteration_limit = optimization_iteration_limit;
     }
     
@@ -38,8 +39,10 @@ public class ClusteringParameters {
      * Set the overall sample count for the cluster optimization process.
      * @param optimization_overall_sample_limit 
      */
-    public void setOptimization_overall_sample_limit(int optimization_overall_sample_limit) {
-        this.optimization_overall_sample_limit = optimization_overall_sample_limit;
+    public void setOptimization_overall_sample_limit(
+            int optimization_overall_sample_limit) {
+        this.optimization_overall_sample_limit = 
+                optimization_overall_sample_limit;
     }
     
     /**
@@ -60,7 +63,8 @@ public class ClusteringParameters {
      * Set the optimization minimal improvement.
      * @param optimization_min_improvement 
      */
-    public void setOptimization_min_improvement(double optimization_min_improvement) {
+    public void setOptimization_min_improvement(
+            double optimization_min_improvement) {
         this.optimization_min_improvement = optimization_min_improvement;
     }
 
@@ -76,14 +80,14 @@ public class ClusteringParameters {
      * Holds the class of the LineParser implementation to use for parsing
      * the training lines.
      */
-    protected String lineParserClassNameForInput = 
-            "be.ugent.intec.ibcn.geo.clustering.LineParserClusterInputDefault";
+    protected String lineParserClassNameForInput = null;
     
     /**
      * Set the the classname of the line parser for the clustering input.
      * @param lineParserClassNameForInput 
      */
-    public void setLineParserClassNameForInput(String lineParserClassNameForInput) {
+    public void setLineParserClassNameForInput(
+            String lineParserClassNameForInput) {
         this.lineParserClassNameForInput = lineParserClassNameForInput;
     }
     
@@ -109,10 +113,12 @@ public class ClusteringParameters {
     }
 
     /**
-     * Set whether only the medoids are written to file, or all the clustering info.
+     * Set whether only the medoids are written to file, or all the clustering 
+     * info.
      * @param writeFullClusteringToFile 
      */
-    public void setWriteFullClusteringToFile(boolean writeFullClusteringToFile) {
+    public void setWriteFullClusteringToFile(
+            boolean writeFullClusteringToFile) {
         this.writeFullClusteringToFile = writeFullClusteringToFile;
     }
 }

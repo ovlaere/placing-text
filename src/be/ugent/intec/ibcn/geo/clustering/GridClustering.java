@@ -67,7 +67,8 @@ public class GridClustering extends AbstractClustering {
     
     /**
      * Implementation of the actual clustering algorithm.
-     * @param outputfile Filename of the file that will contain the cluster medoids.
+     * @param outputfile Filename of the file that will contain the cluster 
+     * medoids.
      */
     @Override
     public void cluster(String outputfile) {
@@ -76,16 +77,18 @@ public class GridClustering extends AbstractClustering {
         // Perpare a threadpool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Prepare the list of futures
-        List<Future<Map<Integer, Long>>> list = new ArrayList<Future<Map<Integer, Long>>>();
+        List<Future<Map<Integer, Long>>> list = 
+                new ArrayList<Future<Map<Integer, Long>>>();
         // Prepare a map for the clusters
         /**
-         * Due to the large number of potential clusters (1 degree lat/1 degree lon)
-         * results in 360 * 180 = 64800 possible clusters, and many of them will
-         * be empty. So in order to avoid a huge list of sparse object, we use a
+         * Due to the large number of potential clusters (1 degree lat/
+         * 1 degree lon) results in 360 * 180 = 64800 possible clusters, 
+         * and many of them will be empty. 
+         * So in order to avoid a huge list of sparse object, we use a
          * map and store only those clusters that actually contain data items.
-         * To this end, a mapping is needed between the x,y coordinate of the cell
-         * in the grid and the Long ID in the list of clusters. See below for more
-         * details of the implementation.
+         * To this end, a mapping is needed between the x,y coordinate of the 
+         * cell in the grid and the Long ID in the list of clusters. See below 
+         * for more details of the implementation.
          */
         Map<Long, Cluster> clusters = new HashMap<Long, Cluster>();
         // Determine the block length to process by each thread.
@@ -96,8 +99,10 @@ public class GridClustering extends AbstractClustering {
                 length = data.length - (i * length);
             }
             int end = begin + length;
-            // Create, track and submit the worker runnables, each with their blocks of data
-            Callable<Map<Integer, Long>> worker = new GridCallable(data, begin, end);
+            // Create, track and submit the worker runnables, each with their 
+            // blocks of data
+            Callable<Map<Integer, Long>> worker = 
+                    new GridCallable(data, begin, end);
             Future<Map<Integer, Long>> submit = executor.submit(worker);
             list.add(submit);
         }        
@@ -178,13 +183,15 @@ public class GridClustering extends AbstractClustering {
 
         // Write to file
         ClusteringIO cio = new ClusteringIO();
-        cio.writeClusteringToFile(clusters, outputfile, parameters.writeFullClusteringToFile);
+        cio.writeClusteringToFile(clusters, outputfile, 
+                parameters.writeFullClusteringToFile);
 
         // Stop the timer
         long overall_stop = System.currentTimeMillis();
 
         // Print final stats
-        System.out.println(" Overall processing time: " + (overall_stop - overall_start) + " ms.");
+        System.out.println(" Overall processing time: " + 
+                (overall_stop - overall_start) + " ms.");
     }
 
     /**
@@ -235,13 +242,17 @@ public class GridClustering extends AbstractClustering {
                     // Sanity check
                     if (p != null) {
                         // Determine cell values
-                        int lat_adapted = (int)((p.getLatitude() + 90) * scale_rows);
-                        int lon_adapted = (int)((p.getLongitude() + 180) * scale_columns);
+                        int lat_adapted = (int)((p.getLatitude() + 90) * 
+                                scale_rows);
+                        int lon_adapted = (int)((p.getLongitude() + 180) * 
+                                scale_columns);
                         // Map to a cluster id using the current scale parameters
-                        long id = (long)(lat_adapted * 360 * scale_rows + lon_adapted);
+                        long id = (long)(lat_adapted * 360 * scale_rows + 
+                                lon_adapted);
                         if (id < 0)
                             throw new RuntimeException("Long underflow");
-                        // Assign this input point to the cluster with the given ID
+                        // Assign this input point to the cluster with the given
+                        // ID
                         mapping.put(p.getId(), id);
                     }
                 }

@@ -12,6 +12,8 @@ import java.util.List;
  * Extend the common parameters with parameters that are specific to the 
  * similarity process.
  * 
+ * @see AbstractParameters
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class SimilarityParameters extends ReferencingParameters {
@@ -98,28 +100,34 @@ public class SimilarityParameters extends ReferencingParameters {
             throw new RuntimeException("Training file is not set.");
         
         if (trainingParser == null)
-            throw new RuntimeException("Parser class for training file is not set.");
+            throw new RuntimeException(
+                    "Parser class for training file is not set.");
         
         if (medoidFile == null)
             throw new RuntimeException("Medoid file is not set.");
         
         if (medoidParser == null)
-            throw new RuntimeException("Parser class for medoid file is not set.");
+            throw new RuntimeException(
+                    "Parser class for medoid file is not set.");
         
         if (testFile == null)
             throw new RuntimeException("Test file is not set.");
         
         if (testParser == null)
-            throw new RuntimeException("Parser class for test file is not set.");
+            throw new RuntimeException(
+                    "Parser class for test file is not set.");
         
         if (classificationFile == null)
-            throw new RuntimeException("Classification output file is not set.");
+            throw new RuntimeException(
+                    "Classification output file is not set.");
         
         if (similarityDir == null)
-            throw new RuntimeException("Directory template to use for index creation is not set.");
+            throw new RuntimeException(
+                    "Directory template to use for index creation is not set.");
         
         if (similarItemsToConsider < 0)
-            throw new RuntimeException("The number of similar items to consider not set.");
+            throw new RuntimeException(
+                    "The number of similar items to consider not set.");
         
         // Check if the similarity cache dir exists
         File dir = new File(similarityDir.substring(0, 

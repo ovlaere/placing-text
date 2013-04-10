@@ -14,7 +14,24 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * TODO Add comment
+ * Actual implementation of a similarity based georeferencer.
+ * 
+ * More advanced than the medoid referencer, this class will determine, for each
+ * test item, to which class it was assigned by the classifier. The results
+ * will be grouped per class.
+ * 
+ * Next, the similarity index will be read from file, for this class, and the
+ * Jaccard similarity will be calculate between all the training items in the 
+ * class and each test item assigned to this class.
+ * 
+ * The location of the most similar item is then returned as the location 
+ * estimate for the test item. In case of absence of a similar item, we fall 
+ * back to returning the location of the medoid of that class.
+ * 
+ * @see SimilarityIndexer
+ * @see Similarity
+ * @see AbstractReferencer
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class SimilarityReferencer extends AbstractReferencer {
@@ -49,7 +66,8 @@ public class SimilarityReferencer extends AbstractReferencer {
                 new NaiveBayesResults(parameters.getClassificationFile());
         
         int counter = 0;
-        Map<Integer, List<Integer>> class_items = new HashMap<Integer, List<Integer>>();
+        Map<Integer, List<Integer>> class_items = 
+                new HashMap<Integer, List<Integer>>();
         
         for (int i = 0; i < test_data.length; i++) {
             DataItem item = test_data[i];
@@ -58,16 +76,19 @@ public class SimilarityReferencer extends AbstractReferencer {
                 // Determine class Id
                 int classId = classifier_output.getPrediction(item.getId());
                 // This info is ignored in this implementation
-                int numberOfTagsUsed = classifier_output.getFeatureCount(item.getId());
+                int numberOfFeaturesUsed = classifier_output.
+                        getFeatureCount(item.getId());
                 
                 List<Integer> list = class_items.get(classId);
                 if (list == null)
                     list = new ArrayList<Integer>();
-                list.add(i); // the number in the list is the actual index in the array
+                // the number in the list is the actual index in the array
+                list.add(i); 
                 class_items.put(classId, list);                    
             }
             else
-                throw new RuntimeException("This should not happen? Test item id " + i);
+                throw new RuntimeException("This should not happen? "
+                        + "Test item id " + i);
         }
 
         System.out.println("Calculating similarities");
@@ -135,9 +156,11 @@ public class SimilarityReferencer extends AbstractReferencer {
         /**
          * Constructor.
          * @param classId The class for which we will process the index.
-         * @param items_for_this_class The list of test IDs assigned to the class.
+         * @param items_for_this_class The list of test IDs assigned to 
+         * the class.
          */
-        public SimilarityHelperRunnable(int classId,  List<Integer> items_for_this_class) {
+        public SimilarityHelperRunnable(int classId,  
+                List<Integer> items_for_this_class) {
             this.classId = classId;
             this.items_for_this_class = items_for_this_class;
         }
@@ -182,7 +205,8 @@ public class SimilarityReferencer extends AbstractReferencer {
                         // Fetch the most similar items
                         SortedSet<SimilarItem> similarities = 
                                 Similarity.jaccard(items, item, 
-                                ((SimilarityParameters)parameters).getSimilarItemsToConsider());
+                                ((SimilarityParameters)parameters).
+                                getSimilarItemsToConsider());
                         // If there are similar items found
                         if (similarities.size() > 0) {
                             predictions.put(item.getId(), 
@@ -192,7 +216,8 @@ public class SimilarityReferencer extends AbstractReferencer {
                         else {
                             // Fall back to medoid
                             predictions.put(item.getId(), 
-                                parameters.getClassMapper().getMedoids().get(classId));
+                                parameters.getClassMapper().getMedoids().
+                                    get(classId));
                         }
                     }
                 }
@@ -205,7 +230,8 @@ public class SimilarityReferencer extends AbstractReferencer {
                     // Sanity check
                     if (item != null) {
                         predictions.put(item.getId(), 
-                            parameters.getClassMapper().getMedoids().get(classId));
+                            parameters.getClassMapper().getMedoids().
+                                get(classId));
                     }
                 }
             }

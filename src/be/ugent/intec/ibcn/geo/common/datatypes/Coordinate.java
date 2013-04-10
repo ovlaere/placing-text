@@ -175,7 +175,8 @@ public class Coordinate {
 
     public double distance(Coordinate q){
         // Return the Euclidean distance between p and q
-        return Math.sqrt(Math.pow((x - q.x), 2) + Math.pow((y - q.y), 2) + Math.pow((z - q.z), 2));
+        return Math.sqrt(Math.pow((x - q.x), 2) + Math.pow((y - q.y), 2) + 
+                Math.pow((z - q.z), 2));
     }
 
     @Override

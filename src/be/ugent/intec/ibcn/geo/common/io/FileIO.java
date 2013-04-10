@@ -1,18 +1,14 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
+import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid;
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.interfaces.LineParserDataItemSimilarity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class provides the necessary IO methods to read data from file.
@@ -37,7 +33,8 @@ public class FileIO {
             lines = Integer.parseInt(in.readLine());
             in.close();
         } catch (NumberFormatException e) {
-            System.out.println("Linecount not found on first line. Will loop trough the file.");
+            System.out.println("Linecount not found on first line. "
+                    + "Will loop trough the file.");
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
         }
@@ -45,7 +42,8 @@ public class FileIO {
         if (lines < 0) {
             int counter = 0;
             try {
-                BufferedReader in = new BufferedReader(new FileReader(filename));
+                BufferedReader in = 
+                        new BufferedReader(new FileReader(filename));
                 while (in.readLine() != null)
                     counter++;
                 in.close();
@@ -56,7 +54,8 @@ public class FileIO {
         }
         // Throw an exception in case something went wrong
         if (lines < 0)
-            throw new RuntimeException("Missing or invalid line count for " + filename);
+            throw new RuntimeException("Missing or invalid line count for " + 
+                    filename);
         return lines;
     }
     
@@ -66,11 +65,13 @@ public class FileIO {
      * @param parserClassName Input parser to use
      * @return A List of Points that represent the cluster centra
      */
-    public static List<Point> loadMedoids(String filename, String parserClassName) {
+    public static List<Point> loadMedoids(String filename, 
+            String parserClassName) {
         List<Point> medoids = new ArrayList<Point>();
         try {
             // Instantiate the parser
-            LineParserMedoid parser = (LineParserMedoid)Util.getParser(parserClassName);
+            LineParserMedoid parser = 
+                    (LineParserMedoid)Util.getParser(parserClassName);
             BufferedReader in = new BufferedReader(new FileReader(filename));
             String line = in.readLine();
             while (line != null) {
@@ -83,7 +84,8 @@ public class FileIO {
         } catch (IOException e) {
             System.err.println("IOException: " + e.getMessage());
         }
-        System.out.println("Loading medoids from " + filename + ". Loaded medoids: " + medoids.size());
+        System.out.println("Loading medoids from " + filename + 
+                ". Loaded medoids: " + medoids.size());
         return medoids;
     }
     

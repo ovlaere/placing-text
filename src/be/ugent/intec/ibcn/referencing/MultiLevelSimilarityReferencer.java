@@ -14,7 +14,31 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * TODO Add comment
+ * More advanced, multilevel similarity based georeferencer.
+ * 
+ * This implementation covers a multi-level similarity based referencer. The 
+ * default constructor with a single SimilarityParameters is changed to a
+ * constructor with a list of parameters, for each of the different levels
+ * you want to include in the referencing process. Please note that the order
+ * in which the parameters are provided, is important. The parameters are 
+ * assumed to represent the coarsest to the finest level of classification, e.g. 
+ * 500, 2500 and 10000 (in that order).
+ * 
+ * Starting at the finest level, for each test item, the number of features used
+ * during classification are retrieved. Due to the decreasing number of features
+ * for models with more classes (and thus finer granularity), it can happen that
+ * a given test item has no features at the finest level, but does have features
+ * at coarser levels. For this reason, if no features were used during 
+ * classification at the given level, we fall back to a coarser level. So for 
+ * each test item, we store at which level the item should be referenced.
+ * 
+ * Then, for each of the different levels, and each of the classes along with
+ * the items to georeference, we calculate the Jaccard similarity against the
+ * training items that are in the given class, in a similar way as is done with
+ * the regular @see SimilarityReferencer.
+ * 
+ * @see AbstractReferencer
+ * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class MultiLevelSimilarityReferencer extends AbstractReferencer {
@@ -32,14 +56,16 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
     /**
      * Constructor.
      * @param parameters Parameters for similarity search. The parameters
-     * expect the different configuration to be in a certain order. For instance,
-     * if you try to run multilevel referencing, the clusterings should be in 
-     * ascending order of number of clusters (i.e. 500, 2500, 10000) in this list.
+     * expect the different configuration to be in a certain order. For 
+     * instance, if you try to run multilevel referencing, the clusterings 
+     * should be in ascending order of number of clusters (i.e. 500, 2500, 
+     * 10000) in this list.
      */
     public MultiLevelSimilarityReferencer(List<SimilarityParameters> parameters) {
         super(null);
         if (parameters == null || parameters.isEmpty())
-            throw new RuntimeException("Please provide valid Similarity Parameters.");
+            throw new RuntimeException("Please provide valid Similarity "
+                    + "Parameters.");
         this.parameters = parameters;
     }
     
@@ -50,23 +76,26 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
     @Override
     public void run(String outputFileName) {
         // Load the test data
-        System.out.println("Loading test from " + parameters.get(0).getTestFile());
+        System.out.println("Loading test from " + parameters.get(0).
+                getTestFile());
         DataLoading dl = new DataLoading();
         // Data is loaded WITHOUT feature selection
         this.test_data = dl.loadDataFromFile(parameters.get(0).getTestFile(), 
-                parameters.get(0).getTestParser(), parameters.get(0).getTestLimit(), null);
+                parameters.get(0).getTestParser(), 
+                parameters.get(0).getTestLimit(), null);
         
         // Prepare an array of classifier output results
         NaiveBayesResults [] classifier_output = 
                 new NaiveBayesResults[parameters.size()];
         // Prepare an array of class and item assignments
-        Map<Integer, List<Integer>>[] class_items = new HashMap[parameters.size()];
-//        // Prepare a map for the acceptance levels of the test items
-//        Map<Integer, Integer> acceptance_levels = new HashMap<Integer, Integer>();
+        Map<Integer, List<Integer>>[] class_items = 
+                new HashMap[parameters.size()];
+
         // Init the data 
         for (int i = 0; i < this.parameters.size(); i++) {
             classifier_output[i] = 
-                    new NaiveBayesResults(parameters.get(i).getClassificationFile());
+                    new NaiveBayesResults(parameters.get(i).
+                    getClassificationFile());
             class_items[i] = new HashMap<Integer, List<Integer>>();
         }
         
@@ -76,25 +105,31 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
             // Sanity check
             if (item != null) {
                 // Loop over the multiple levels
-                for (int level_index = parameters.size() - 1; level_index >= 0; ) {
-                    // Determine the number of tags used at this level
-                    int numberOfTagsUsed = 
-                            classifier_output[level_index].getFeatureCount(item.getId());
-                    // If classification was guessing and there are coarser levels
-                    if (numberOfTagsUsed == 0 && level_index > 0) {
+                for (int level_index = parameters.size() - 1; 
+                        level_index >= 0; ) {
+                    // Determine the number of features used at this level
+                    int numberOfFeaturesUsed = 
+                            classifier_output[level_index].
+                            getFeatureCount(item.getId());
+                    // If classification was guessing and there are coarser 
+                    // levels
+                    if (numberOfFeaturesUsed == 0 && level_index > 0) {
                         level_index--;
                         continue;
                     }
                     
-                    // If we end up here, we have a 'valid' or last resort classification
+                    // If we end up here, we have a 'valid' or last resort 
+                    // classification
                     
                     // Determine class Id for the current level
-                    int classId = classifier_output[level_index].getPrediction(item.getId());
+                    int classId = classifier_output[level_index].
+                            getPrediction(item.getId());
                     
                     List<Integer> list = class_items[level_index].get(classId);
                     if (list == null)
                         list = new ArrayList<Integer>();
-                    list.add(i); // the number in the list is the actual index in the array
+                    // the number in the list is the actual index in the array
+                    list.add(i); 
                     class_items[level_index].put(classId, list);
                     
                     // Make sure we don't loop again
@@ -102,7 +137,8 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
                 }
             }
             else {
-                throw new RuntimeException("This should not happen? Test item id " + i);
+                throw new RuntimeException(
+                        "This should not happen? Test item id " + i);
             }
         }
 
@@ -118,8 +154,9 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
         // Loop over the different levels
         for (int i = 0; i < this.parameters.size(); i++) {
             // Print some stats
-            System.out.println("Clustering " + parameters.get(i).getClassMapper().size() + 
-                " for " + class_items[i].size() + " classes.");
+            System.out.println("Clustering " + parameters.get(i).
+                    getClassMapper().size() + " for " + class_items[i].size() + 
+                    " classes.");
             total_to_process += class_items[i].size();
         
             // For each of the classes we need to process for this level
@@ -177,17 +214,21 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
         private List<Integer> items_for_this_class;
 
         /**
-         * Local reference to the parameters used for processing in this callable.
+         * Local reference to the parameters used for processing in this 
+         * callable.
          */
         private SimilarityParameters parameters;
         
         /**
          * Constructor.
          * @param classId The class for which we will process the index.
-         * @param items_for_this_class The list of test IDs assigned to the class.
-         * @param parameters Local reference to the parameters used for processing in this callable.
+         * @param items_for_this_class The list of test IDs assigned to the 
+         * class.
+         * @param parameters Local reference to the parameters used for 
+         * processing in this callable.
          */
-        public SimilarityHelperRunnable(int classId,  List<Integer> items_for_this_class, 
+        public SimilarityHelperRunnable(int classId,  
+                List<Integer> items_for_this_class, 
                 SimilarityParameters parameters) {
             this.classId = classId;
             this.items_for_this_class = items_for_this_class;
@@ -244,7 +285,8 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
                         else {
                             // Fall back to medoid
                             predictions.put(item.getId(), 
-                                this.parameters.getClassMapper().getMedoids().get(classId));
+                                this.parameters.getClassMapper().getMedoids().
+                                    get(classId));
                         }
                     }
                 }
@@ -257,7 +299,8 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
                     // Sanity check
                     if (item != null) {
                         predictions.put(item.getId(), 
-                            this.parameters.getClassMapper().getMedoids().get(classId));
+                            this.parameters.getClassMapper().getMedoids().
+                                get(classId));
                     }
                 }
             }

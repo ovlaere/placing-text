@@ -40,14 +40,14 @@ import java.util.List;
  *      - k = 2500 , # features = 175K, dirichlet mu value = 12500
  *      - k = 10000, # features = 125K, dirichlet mu value =   500
  *  4) A multilevel referencer is run. If the classification assigned a test
- *     item to a certain class, without having any tags at that level, we fall
+ *     item to a certain class, without having any features at that level, we fall
  *     back to a coarser level, until we run out. Next, the most similar
  *     training item from that area is returned as the location estimate.
  * 
  * This implementation does not use any visual features at all. Also, the actual
  * run1 for placing2012 used metadata from for instance the textual home location
  * of the user of the Flickr photos, description and comment info, while in this
- * version, a training item without tags is a lost cause, yielding worse results
+ * version, a training item without features is a lost cause, yielding worse results
  * than our actual submission. 
  * 
  * If you have signed the data agreement between MediaEval and yourself, you

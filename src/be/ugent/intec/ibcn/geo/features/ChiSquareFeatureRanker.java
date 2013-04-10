@@ -52,7 +52,8 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Track futures
-        List<Future<ScoringResult>> list = new ArrayList<Future<ScoringResult>>();
+        List<Future<ScoringResult>> list = 
+                new ArrayList<Future<ScoringResult>>();
         // For each GeoClass
         for (GeoClass geoclass : this.classmapper.getClasses()) {
             // Do chi2 calculation
@@ -85,7 +86,8 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         FeaturesIO.exportFeaturesToFile(features, outputfile);
         // Stop the timer
         long stop = System.currentTimeMillis();
-        System.out.println("Retained features: " + features.size() + " ("+(stop-start)+" ms.)");
+        System.out.println("Retained features: " + features.size() + 
+                " ("+(stop-start)+" ms.)");
     }
 
     /**
@@ -100,41 +102,43 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         for (List<Object> list : class_rankings) {
             max_size = Math.max(max_size, list.size());
         }
-        // Prepare a list of rounds, to gather the features in a round robin fashion
+        // Prepare a list of rounds, to gather the features in a round 
+        // robin fashion
         List<Set<Object>> rounds = new ArrayList<Set<Object>>();
-        // Track the unique global tags
-        Set<Object> uniqueTags = new HashSet<Object>();
+        // Track the unique global features
+        Set<Object> uniqueFeatures = new HashSet<Object>();
         // round robin result aggregation
         for (int i = 0; i < max_size; i++) {
             // For each of the known classIds
             for (int classId = 0; classId < class_rankings.length; classId++) {
                 // Fetch the feature ranking
                 List<Object> list = class_rankings[classId];
-                // If there are tags remaining beyond round i
+                // If there are features remaining beyond round i
                 if (list.size() >= (i + 1)) {
-                    // Get the tag
-                    Object tag = list.get(i);
-                    // If this is not the empty tag
-                    if (((String)tag).trim().length() > 0 && !((String)tag).equals("")) {
+                    // Get the feature
+                    Object feature = list.get(i);
+                    // If this is not the empty feature
+                    if (((String)feature).trim().length() > 0 && 
+                            !((String)feature).equals("")) {
                         Set<Object> set;
                         // If there already exists a set of elements for pos i
                         if (rounds.size() >= i+1) {
                             // Fetch
                             set = rounds.get(i);
-                            if (!uniqueTags.contains(tag)) {
+                            if (!uniqueFeatures.contains(feature)) {
                                 // Add this element to its position set
-                                set.add(tag);
-                                uniqueTags.add(tag);
+                                set.add(feature);
+                                uniqueFeatures.add(feature);
                             }
                         }
                         // If not
                         else {
                             // Init it
                             set = new HashSet<Object>();
-                            if (!uniqueTags.contains(tag)) {
+                            if (!uniqueFeatures.contains(feature)) {
                                 // Add this element to its position set
-                                set.add(tag);
-                                uniqueTags.add(tag);
+                                set.add(feature);
+                                uniqueFeatures.add(feature);
                             }
                             // Add this set to the rounds set
                             rounds.add(set);
@@ -152,7 +156,8 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
             List<Object> shuffled = new ArrayList<Object>(round_set);
             // to shuffle them
             Collections.shuffle(shuffled, rg);
-            // Add these to the list of current tags - random order implied by HashSet
+            // Add these to the list of current features - 
+            // random order implied by HashSet
             features.addAll(shuffled);
         }
         return features;
@@ -161,21 +166,22 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
     /**
      * Helper method calculating the chi2 value for a specific GeoClass.
      * @param geoclass the geoclass to calculate the chi2 value for
-     * @return a Map containing the tags of this area, 
+     * @return a Map containing the features of this area, 
      * ordered in descending order (best chi2 first), along with their scores
      */
     protected Map<Object, Double> calculateScoreForClass(GeoClass geoclass) {
         // Prepare a map for the results
         Map<Object, Double> results  = new HashMap<Object, Double>();
-        // Create a tag count map for this area
-        Map<Object, Integer> classTagCount = this.otc.getClassTagCount(geoclass, data);
+        // Create a feature count map for this area
+        Map<Object, Integer> classFeatureCount = 
+                this.otc.getClassFeatureCount(geoclass, data);
         // Fetch the number of items in this class
         long photos_in_area = geoclass.getElements().size();
         long N = -1;
         // Calculate the chi2 values
-        for (Object tag : classTagCount.keySet()) {
-            long a = classTagCount.get(tag);
-            long b = otc.getTagCount(tag) - a;
+        for (Object feature : classFeatureCount.keySet()) {
+            long a = classFeatureCount.get(feature);
+            long b = otc.getFeatureCount(feature) - a;
             long c = photos_in_area - a;
             long d = total_photos - photos_in_area - b;
 
@@ -213,7 +219,7 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
                 System.out.println((a+c)*(b+d)*(a+b)*(c+d));
                 System.out.println(denominator);
             }
-            results.put(tag, chi_square_value);
+            results.put(feature, chi_square_value);
         }
         // Sort the results by value descending
         results = Util.sortByValueDescending(results);
@@ -222,8 +228,8 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         Map<Object, Double> filtered = new HashMap<Object, Double>();
         Iterator<Object> it = results.keySet().iterator();
         while (it.hasNext()){
-            Object tag = it.next();
-            filtered.put(tag,results.get(tag));
+            Object feature = it.next();
+            filtered.put(feature,results.get(feature));
         }
         filtered = Util.sortByValueDescending(filtered);
         return filtered;
@@ -248,12 +254,13 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         }
 
         /**
-         * @return A map with the tags in this class and their scores.
+         * @return A map with the features in this class and their scores.
          * @throws Exception 
          */
         @Override
         public ScoringResult call() throws Exception {
-            return new ScoringResult(geoclass, calculateScoreForClass(geoclass));
+            return new ScoringResult(geoclass, 
+                    calculateScoreForClass(geoclass));
         }
     }
     

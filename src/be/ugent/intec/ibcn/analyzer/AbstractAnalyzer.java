@@ -20,7 +20,8 @@ public abstract class AbstractAnalyzer {
     /**
      * Numberformat.
      */
-    protected  static final NumberFormat formatter = new DecimalFormat("#00.00");
+    protected  static final NumberFormat formatter = 
+            new DecimalFormat("#00.00");
 
     /**
      * Parameters to use for analyzing.

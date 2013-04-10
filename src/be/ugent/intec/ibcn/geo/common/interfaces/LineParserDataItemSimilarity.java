@@ -21,7 +21,7 @@ public interface LineParserDataItemSimilarity {
     /**
      * Actual parse implementation.
      * @param line The String input line from file
-     * @return An instantiated DataItem or null if no tags were present
+     * @return An instantiated DataItem or null if no features were present
      */
     public DataItem parse(String line);
 }

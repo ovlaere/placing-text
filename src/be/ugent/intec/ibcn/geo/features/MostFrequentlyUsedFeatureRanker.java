@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 /**
- * This class implements a simple most used tag occurence feature ranking.
+ * This class implements a simple most used feature occurrence feature ranking.
  * 
  * For more details
- *  @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0085
+ * @see http://www.sciencedirect.com/science/article/pii/S002002551300162X#s0085
  * 
  * This implementation currently uses a full load of the data, while it would
  * be possible to just run through the input file and keep statistics.
@@ -26,7 +26,8 @@ public class MostFrequentlyUsedFeatureRanker {
     /**
      * Number of threads, for multi-threaded processing.
      */
-    private static final int NR_THREADS = Runtime.getRuntime().availableProcessors();
+    private static final int NR_THREADS = 
+            Runtime.getRuntime().availableProcessors();
 
     /**
      * @return the name of this ranking method
@@ -35,26 +36,36 @@ public class MostFrequentlyUsedFeatureRanker {
         return "Most Frequently used";
     }
 
-    
     /**
      * The training data.
      */
     protected DataItem [] data;
-    
-    public MostFrequentlyUsedFeatureRanker(String inputfile, String inputParser) {
+
+    /**
+     * Constructor.
+     * @param inputfile filename of the training data
+     * @param inputParser parser for the training data
+     */
+    public MostFrequentlyUsedFeatureRanker(String inputfile, 
+            String inputParser) {
         // Load the training data 
         DataLoading dl = new DataLoading();
         this.data = dl.loadDataFromFile(inputfile, inputParser, -1, null);
     }
 
+    /**
+     * Actual most used feature ranking.
+     * @param outputfile filename of the file to write the output to
+     */
     public void process(String outputfile) {
         System.out.println("Doing "+ getMethodName() +" feature selection.");
-        // Tag and occurence count
+        // feature and occurence count
         Map<Object, Integer> map = new HashMap<Object, Integer>();
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Track futures
-        List<Future<Map<String, Integer>>> list = new ArrayList<Future<Map<String, Integer>>>();
+        List<Future<Map<String, Integer>>> list = 
+                new ArrayList<Future<Map<String, Integer>>>();
         // Determine block length
         int length = (int) (data.length * 1.0 / NR_THREADS);
         for (int i = 0; i < NR_THREADS; i++) {
@@ -64,7 +75,8 @@ public class MostFrequentlyUsedFeatureRanker {
             }
             int end = begin + length;
             // Start helper callables
-            Callable<Map<String, Integer>> worker = new CounterHelper(begin, end);
+            Callable<Map<String, Integer>> worker = 
+                    new CounterHelper(begin, end);
             Future<Map<String, Integer>> submit = executor.submit(worker);
             list.add(submit);
         }
@@ -73,17 +85,17 @@ public class MostFrequentlyUsedFeatureRanker {
             try {
                 Map<String, Integer> submap = future.get();
                 // For all the items in the submap
-                for (String tag : submap.keySet()) {
+                for (String feature : submap.keySet()) {
                     // Get the count in the main map
-                    Integer count = map.get(tag);
+                    Integer count = map.get(feature);
                     // If there is none
                     if (count == null)
                         // Init a value
                         count = 0;
                     // Add the count of the submap
-                    count+= submap.get(tag);
+                    count+= submap.get(feature);
                     // Store this in the main map
-                    map.put(tag, count);
+                    map.put(feature, count);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -97,7 +109,7 @@ public class MostFrequentlyUsedFeatureRanker {
         // Wait until all threads are finish
         while (!executor.isTerminated()) {}
 
-        // Sort descending by the most used tags
+        // Sort descending by the most used features
         map = Util.sortByValueDescending(map);
         // Fetch the features
         List<Object> features = new ArrayList(map.keySet());
@@ -106,7 +118,7 @@ public class MostFrequentlyUsedFeatureRanker {
     }
 
     /**
-     * Helper class for counting tags.
+     * Helper class for counting features.
      */
     private class CounterHelper implements Callable<Map<String, Integer>>{
 
@@ -131,8 +143,9 @@ public class MostFrequentlyUsedFeatureRanker {
         }
 
         /**
-         * Actual tag counting
-         * @return A map with the Tag - Occurrences for this part of the data
+         * Actual feature counting
+         * @return A map with the feature - Occurrences for this part of the 
+         * data
          * @throws Exception 
          */
         @Override
@@ -147,15 +160,16 @@ public class MostFrequentlyUsedFeatureRanker {
                 if (item != null) {
                     Object [] data = item.getData();
                     for (Object o : data) {
-                        String tag = (String)o;
+                        String feature = (String)o;
                         // Sanity check
-                        if (tag.trim().length() > 0 && !tag.equals("")) {
+                        if (feature.trim().length() > 0 && 
+                                !feature.equals("")) {
                             // Track occurrences
-                            Integer count = local_map.get(tag);
+                            Integer count = local_map.get(feature);
                             if (count == null)
                                 count = 0;
                             count++;
-                            local_map.put(tag, count);
+                            local_map.put(feature, count);
                         }
                     }
                 }
