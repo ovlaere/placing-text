@@ -74,5 +74,15 @@ public class FeatureExample {
 //        
 //        GeoSpreadFeatureRanker gsf = new GeoSpreadFeatureRanker();
 //        gsf.process(trainingFile, trainingParser, -1, Util.applyTemplateValues(featureTemplate, new String[]{"geo"}));
+//        
+//        /**
+//         * Ripley K example
+//         */
+//        
+//        RipleyKFeatureRanker rf = new RipleyKFeatureRanker(trainingFile, trainingParser);
+//        rf.process(Util.applyTemplateValues(featureTemplate, new String[]{"ripley_KN"}), 1, RipleyKFeatureRanker.RIPLEY_K_N_SCORE);
+// 
+//        rf = new RipleyKFeatureRanker(trainingFile, trainingParser);
+//        rf.process(Util.applyTemplateValues(featureTemplate, new String[]{"ripley_KlogN"}), 1, RipleyKFeatureRanker.RIPLEY_K_LOG_N_SCORE);
     }
 }
