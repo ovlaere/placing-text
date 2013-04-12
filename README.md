@@ -39,11 +39,33 @@ georeferencing problem: a training and a test file. The file format is up to you
 as you can implement your own parsers. The examples however use a parser that
 expects these files to have a format such as 
 
+    <number_of_items>
+    ID,...,latitude,longitude,tag tag tag tag
+    ID,...,latitude,longitude,tag tag tag tag
+    ...
     ID,...,latitude,longitude,tag tag tag tag
 
 That is, and ID, an obsolete field (in my case - flickr data - that was the 
 owner which is unused in this implementation), the latitude and longitude of the
 item and a space-separated field of tags.
+
+**Important:** To increase performance, the framework tries to read the number of 
+lines in the training and test file from the first line. If you put the number
+of items in that line, this is parsed and used in the code. If you forget this
+or omit this on purpose, the framework will loop through the file to determine
+the number of lines in the file. When using training files consisting of for
+instance 32 million lines, this might decrease your performance.
+
+Most parts of the code are parallelized for execution on multiple cores, so the
+more cores you have on the system running this code, the better.
+
+As for memory requirements: the language models are build in memory, so the more
+memory you can spare the virtual machine (-Xmx parameter), the better. If you
+try to run a model with lots of classes and lots of features, the code will run
+through it in batches (e.g. 1000 classes a time using 1M features), while more
+memory or less features would allow you to process 3000 classes per batch. 
+Anyway, this is nothing to worry about at this point. Just start running the 
+examples and see where you get.
 
 The workflow to obtain location predictions for a set of test items, starting
 from the training data, is the following:
