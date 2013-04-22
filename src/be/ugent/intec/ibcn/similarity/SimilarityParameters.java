@@ -129,13 +129,6 @@ public class SimilarityParameters extends ReferencingParameters {
             throw new RuntimeException(
                     "The number of similar items to consider not set.");
         
-        // Check if the similarity cache dir exists
-        File dir = new File(similarityDir.substring(0, 
-                similarityDir.lastIndexOf("/")));
-        if (!dir.exists())
-            // If not, create the directories
-            dir.mkdirs();
-        
         // Load the medoids
         List<Point> medoids = FileIO.loadMedoids(medoidFile, medoidParser);
         this.classmapper = new ClassMapper(medoids);
