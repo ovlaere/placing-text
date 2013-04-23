@@ -140,6 +140,7 @@ public class ClassMapper {
      * no class was found.
      */
     private int findClassId(Point p, KDTree<Integer> kd) {
+        int classId = -1;
         // Sanity check
         if (p != null) {
             try {
@@ -148,7 +149,6 @@ public class ClassMapper {
                 List<Integer> neighbours = kd.nearest(
                         new Coordinate(p).doubleKey(), 1);
                 // Fetch the remapped ID of the GeoClass that is the best match
-                int classId = 0;
                 try {
                     classId = neighbours.get(0);
                 } catch (java.lang.ArrayIndexOutOfBoundsException e) {
@@ -161,7 +161,7 @@ public class ClassMapper {
             }
         }
         // Return null if not found
-        return -1;
+        return classId;
     }
     
     /**
