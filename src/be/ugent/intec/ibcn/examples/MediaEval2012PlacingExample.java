@@ -129,7 +129,7 @@ public class MediaEval2012PlacingExample {
 
                 PamParameters pp = new PamParameters();
                 AbstractClustering clusteringPam = new PamClustering(pp, data, clusters);
-                clusteringPam.cluster(clusteringOutputFile + "." + clusters);
+                clusteringPam.cluster(clusteringOutputFile);
             }            
         } // End clustering loop
         
