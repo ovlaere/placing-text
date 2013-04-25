@@ -26,11 +26,6 @@ This code has been used to participate in the 2010, 2011 and 2012
 run a baseline submission for this task. This framework uses only textual meta-
 data, no visual features are used.
 
-License
--------
-
-*TODO*
-
 How to get started
 ==================
 
