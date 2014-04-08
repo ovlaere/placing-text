@@ -235,10 +235,10 @@ public class GeoSpreadFeatureRanker {
                     double lon = item.getLongitude();
                 
                     // Determine cell values
-                    int stat_x = Math.min((int)(Math.floor(lat + 90) * 
-                            scale_rows), grid_x - 1);
-                    int stat_y = Math.min((int)(Math.floor(lon + 180)* 
-                            scale_columns), grid_y - 1);
+                    int stat_x = Math.min((int)(Math.floor((lat + 90) * 
+                            scale_rows)), grid_x - 1);
+                    int stat_y = Math.min((int)(Math.floor((lon + 180)* 
+                            scale_columns)), grid_y - 1);
                     // Fetch the item payload
                     String [] data = (String[])item.getData();
                     // If there are features
@@ -373,10 +373,10 @@ public class GeoSpreadFeatureRanker {
                         double lon = item.getLongitude();
 
                         // Determine cell values
-                        int stat_x = Math.min((int)(Math.floor(lat + 90) * 
-                                scale_rows), grid_x - 1);
-                        int stat_y = Math.min((int)(Math.floor(lon + 180)* 
-                                scale_columns), grid_y - 1);
+                        int stat_x = Math.min((int)(Math.floor((lat + 90) * 
+                                scale_rows)), grid_x - 1);
+                        int stat_y = Math.min((int)(Math.floor((lon + 180)* 
+                                scale_columns)), grid_y - 1);
                                                 
                         String [] data = (String[])item.getData();
                         if (data.length > 0) {
