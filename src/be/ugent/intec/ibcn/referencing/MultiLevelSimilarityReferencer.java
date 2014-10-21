@@ -1,5 +1,20 @@
 package be.ugent.intec.ibcn.referencing;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import be.ugent.intec.ibcn.geo.classifier.NaiveBayesResults;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
@@ -9,9 +24,6 @@ import be.ugent.intec.ibcn.similarity.SimilarItem;
 import be.ugent.intec.ibcn.similarity.Similarity;
 import be.ugent.intec.ibcn.similarity.SimilarityIndexer;
 import be.ugent.intec.ibcn.similarity.SimilarityParameters;
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * More advanced, multilevel similarity based georeferencer.
@@ -151,6 +163,7 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
                 new ArrayList<Future<Map<Integer, Point>>>(); 
         
         int total_to_process = 0;
+        int batches_launched = 0;
         // Loop over the different levels
         for (int i = 0; i < this.parameters.size(); i++) {
             // Print some stats
@@ -158,16 +171,23 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
                     getClassMapper().size() + " for " + class_items[i].size() + 
                     " classes.");
             total_to_process += class_items[i].size();
-        
+            
             // For each of the classes we need to process for this level
             for (int classId : class_items[i].keySet()) {
-                // Init a Callable, track the future, execute
-                Callable<Map<Integer, Point>> worker = 
-                        new SimilarityHelperRunnable(classId, 
-                        class_items[i].get(classId), parameters.get(i));
-                Future<Map<Integer, Point>> submit = 
-                        executor.submit(worker);
-                list.add(submit);
+            	
+            	// Batch this
+            	int batch_size = 50;
+            	List<Integer> items_to_process = class_items[i].get(classId);
+            	int batches = (items_to_process.size() / batch_size) + 1;
+            	for (int j = 0; j < batches; j++) {
+            		List<Integer> sublist = items_to_process.subList(
+            				j * batch_size, Math.min((j+1) * batch_size, items_to_process.size()));
+    	            // Init a Callable, track the future, execute
+            		Callable<Map<Integer, Point>> worker = new SimilarityHelperRunnable(classId, sublist, parameters.get(i));
+    	            Future<Map<Integer, Point>> submit = executor.submit(worker);
+    	            list.add(submit);
+    	            batches_launched++;
+            	}
             }
         }
         // Prepare the results
@@ -182,9 +202,9 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            // Report similarity progress every 25 classes
+            // Report similarity progress every 25 batches
             if (++counter % 25 == 0)
-                System.out.println(counter + "/" + total_to_process);
+                System.out.println(counter + "/" + batches_launched);
         }
         // This will make the executor accept no new threads
         // and finish all existing threads in the queue

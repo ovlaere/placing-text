@@ -99,17 +99,25 @@ public class SimilarityReferencer extends AbstractReferencer {
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Prepare a list for the futures
         List<Future<Map<Integer, Point>>> list = 
-                new ArrayList<Future<Map<Integer, Point>>>(); 
+                new ArrayList<Future<Map<Integer, Point>>>();
+        int batches_launched = 0;
         // For each of the classes we need to process
         for (int classId : class_items.keySet()) {
-            // Init a Callable, track the future, execute
-            Callable<Map<Integer, Point>> worker = 
-                    new SimilarityHelperRunnable(
-                        classId, class_items.get(classId));
-            Future<Map<Integer, Point>> submit = 
-                    executor.submit(worker);
-            list.add(submit);
+        	// Batch this
+        	int batch_size = 50;
+        	List<Integer> items_to_process = class_items.get(classId);
+        	int batches = (items_to_process.size() / batch_size) + 1;
+        	for (int i = 0; i < batches; i++) {
+        		List<Integer> sublist = items_to_process.subList(
+        				i * batch_size, Math.min((i+1) * batch_size, items_to_process.size()));
+	            // Init a Callable, track the future, execute
+	            Callable<Map<Integer, Point>> worker = new SimilarityHelperRunnable(classId, sublist);
+	            Future<Map<Integer, Point>> submit = executor.submit(worker);
+	            list.add(submit);
+	            batches_launched++;
+        	}
         }
+        System.out.println("Similarity batches launched: " + batches_launched);
         // Prepare the results
         Map<Integer, Point> predictions = new TreeMap<Integer, Point>();
         // Retrieve the results
@@ -122,9 +130,9 @@ public class SimilarityReferencer extends AbstractReferencer {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            // Report similarity progress every 25 classes
+            // Report similarity progress every 25 batches
             if (++counter % 25 == 0)
-                System.out.println(counter);
+                System.out.println(counter + "/" + batches_launched);
         }
         // This will make the executor accept no new threads
         // and finish all existing threads in the queue
