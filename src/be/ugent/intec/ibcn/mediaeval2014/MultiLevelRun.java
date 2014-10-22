@@ -22,6 +22,7 @@ import be.ugent.intec.ibcn.similarity.SimilarityIndexer;
 import be.ugent.intec.ibcn.similarity.SimilarityParameters;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +86,35 @@ import java.util.List;
  *  
  *  The 3 parameters are training file, test file and a label, to be used to
  *  distinguish between different output files for different run configurations.
+ * 
+ * The training data was normalized to improve performance a bit. This process
+ * consisted of:
+ * 	- URL decoding the raw tag in UTF-8 format
+ *  - Replacing all whitespaces by ""
+ *  - Normalizing the tag using java.text.Normalizer
+ *  - Retaining alphanumeric characters only
+ *  
+ *  The results using this training and test set, the normalized input data and this
+ *  workflow below, are:
+ * 
+ * Error range (km)     % within    # within    # total
+ *              0.001       00.11       552     510000
+ *              0.01        00.34      1743     510000
+ *              0.1         03.60     18350     510000
+ *              1.0         17.68     90181     510000
+ *              5.0         33.52    170967     510000
+ *              10.0        39.17    199768     510000
+ *              50.0        47.72    243352     510000
+ *              100.0       50.66    258378     510000
+ *              1000.0      61.96    315984     510000
+ *              10000.0     90.52    461629     510000
+ *              40000.0    100.00    510000     510000
+ *              
+ * Quartile error:
+ * 
+ * 25%	Q1	  02.09 km
+ * 50%	Q2	  84.90 km (median)
+ * 75%	Q3	4143.23 km
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
