@@ -29,6 +29,19 @@ data, no visual features are used.
 How to get started
 ==================
 
+* `git clone git@github.com:ovlaere/placing-text.git`
+* Locate a suitable training and test file and add them to the folder (see below)
+* `mvn package` in the root folder of the project
+* run one of the scripts, for instance:
+
+<!-- hack to break list --> 
+
+    java -cp target/placing-text-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
+    -Xms2g -Xmx4g -ea -Dfile.encoding=UTF-8 \
+    be.ugent.intec.ibcn.examples.FeatureExample 
+
+Please note that this example assumes that you have a file called `training` in the same folder. See the source code for more examples. But you get the idea, don't you.
+
 The code in this framework expects two files to be present for you 
 georeferencing problem: a training and a test file. The file format is up to you
 as you can implement your own parsers. The examples however use a parser that
