@@ -1,5 +1,9 @@
 package be.ugent.intec.ibcn.mediaeval2014;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import be.ugent.intec.ibcn.analyzer.AbstractAnalyzer;
 import be.ugent.intec.ibcn.analyzer.AnalyzerParameters;
 import be.ugent.intec.ibcn.analyzer.DistanceThresholdAnalyzer;
@@ -20,11 +24,6 @@ import be.ugent.intec.ibcn.referencing.ReferencingParameters;
 import be.ugent.intec.ibcn.referencing.SimilarityReferencer;
 import be.ugent.intec.ibcn.similarity.SimilarityIndexer;
 import be.ugent.intec.ibcn.similarity.SimilarityParameters;
-
-import java.io.File;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class implements a more or less copy of the 
