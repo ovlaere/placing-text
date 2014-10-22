@@ -68,12 +68,12 @@ public class FeatureExample {
 //                trainingFile, trainingParser);
 //        mfu.process(Util.applyTemplateValues(featureTemplate, new String[]{"mostused"}));
 //        
-//        /**
-//         * Geospread example
-//         */
-//        
-//        GeoSpreadFeatureRanker gsf = new GeoSpreadFeatureRanker();
-//        gsf.process(trainingFile, trainingParser, -1, Util.applyTemplateValues(featureTemplate, new String[]{"geo"}));
+        /**
+         * Geospread example
+         */
+        
+        GeoSpreadFeatureRanker gsf = new GeoSpreadFeatureRanker();
+        gsf.process(trainingFile, trainingParser, -1, Util.applyTemplateValues(featureTemplate, new String[]{"geo"}));
 //        
 //        /**
 //         * Ripley K example
