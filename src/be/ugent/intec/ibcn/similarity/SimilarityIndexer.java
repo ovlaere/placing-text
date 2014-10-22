@@ -243,6 +243,7 @@ public class SimilarityIndexer {
                 // did not contain that info on the first line.
                 in.readLine(); 
                 int counter = 0;
+                int noTags = 0;
                 String line = in.readLine();
                 // Get the parser
                 LineParser parser = 
@@ -250,7 +251,11 @@ public class SimilarityIndexer {
                 while (line != null) {
                     DataItem item = (DataItem)parser.parse(line);
                     // Fetch the class assignment for this line number
-                    Integer classId = line_class_map.get(item.getId());
+                    Integer classId = null;
+                    if (item != null) 
+                    	classId = line_class_map.get(item.getId());
+                    else
+                    	noTags++;
                     // If we the class is in this batch
                     if (classId != null && 
                             classesInCurrentBatch.contains(classId)) {
@@ -260,11 +265,12 @@ public class SimilarityIndexer {
                     line = in.readLine();
                     // report progress after 1M items
                     if (++counter % 1000000 == 0)
-                        System.out.println(counter);
+                        System.out.println(counter + " training items without tags: " + noTags);
                     // In case we hit the global linelimit
                     if (counter == linelimit)
                         break;
-                }         
+                }      
+                System.out.println("Training data without tags: " + noTags);
                 // Close the input
                 in.close();
                 // Close all the open files
