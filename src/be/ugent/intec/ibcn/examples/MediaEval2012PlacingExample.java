@@ -75,7 +75,7 @@ public class MediaEval2012PlacingExample {
         int [] dirichletMus = new int []{15000, 12500, 500};
 
         // Shorthand for the dir prefix for the filenames
-        String dataDir = "/"; // Your actual dataDir here
+        String dataDir = "./"; // Your actual dataDir here
         
         // Provide the full path and filename of the files that will be used
         String trainingFile = dataDir + "training"; // Your actual training file here

@@ -20,7 +20,7 @@ public class AnalyzerExample {
     public static void main(String[] args) {
         
         // Shorthand for the dir prefix for the filenames
-        String dataDir = "/"; // Your actual dataDir here
+        String dataDir = "./"; // Your actual dataDir here
         
         // Provide the full path and filename of the files that will be used
         String testFile     = dataDir + "test"; // Your actual test file here
