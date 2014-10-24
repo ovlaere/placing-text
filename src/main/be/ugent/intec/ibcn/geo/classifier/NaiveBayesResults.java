@@ -1,7 +1,18 @@
 package be.ugent.intec.ibcn.geo.classifier;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class serves the results of the classification step as an object.
@@ -11,7 +22,12 @@ import java.util.*;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class NaiveBayesResults {
-
+	
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(NaiveBayesResults.class);
+	
     /**
      * Map containing the predicted area for every specific photo.
      */
@@ -131,7 +147,7 @@ public class NaiveBayesResults {
      */
     public NaiveBayesResults(String filename) {
         this();
-        System.out.println("Loading NB Results from " + filename);
+        LOG.info("Loading NB Results from {}", filename);
         // Load the data from file
         initNaiveBayesResults(filename);
     }
@@ -170,8 +186,8 @@ public class NaiveBayesResults {
             }
             in.close();
         }
-        catch (IOException ex) {
-            System.err.println("IOException: " + ex.getMessage());
+        catch (IOException e) {
+        	LOG.error("IOException: {}", e.getMessage());
         }
     }
     
@@ -189,7 +205,7 @@ public class NaiveBayesResults {
                             scores.get(id) + "\t" + features.get(id));
             out.close();
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
         }
     }
 }

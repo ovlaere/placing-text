@@ -1,7 +1,17 @@
 package be.ugent.intec.ibcn.geo.common;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParser;
-import java.util.*;
 
 /**
  * This class provides some generic helper methods.
@@ -9,6 +19,11 @@ import java.util.*;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class Util {
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(Util.class);
 
     /**
      * Helper method that sorts a Map by its values, not the keys.
@@ -93,14 +108,14 @@ public class Util {
         // Instantiate the parser
         try {
             parser = (LineParser) Class.forName(parserClassName).newInstance();
-        } catch (InstantiationException ex) {
-            System.err.println("InstantiationException " + ex.getMessage());
+        } catch (InstantiationException e) {
+            LOG.error("InstantiationException: {}", e.getMessage());
             System.exit(1);
-        } catch (IllegalAccessException ex) {
-            System.err.println("IllegalAccessException " + ex.getMessage());
+        } catch (IllegalAccessException e) {
+            LOG.error("IllegalAccessException: {}", e.getMessage());
             System.exit(1);
-        } catch (ClassNotFoundException ex) {
-            System.err.println("ClassNotFoundException " + ex.getMessage());
+        } catch (ClassNotFoundException e) {
+            LOG.error("ClassNotFoundException: {}", e.getMessage());
             System.exit(1);
         }
         // If parser is null

@@ -1,8 +1,12 @@
 package be.ugent.intec.ibcn.geo.classifier;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.AbstractParameters;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
-import java.util.Map;
 
 /**
  * Extend the common parameters with parameters that are specific to the 
@@ -14,6 +18,11 @@ import java.util.Map;
  */
 public class ClassifierParameters extends AbstractParameters {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(ClassifierParameters.class);
+	
     /**
      * The filename of the file containing the features for classification.
      */
@@ -100,7 +109,7 @@ public class ClassifierParameters extends AbstractParameters {
      */
     public void setDirichletMu(double dirichletMu) {
         this.dirichletMu = dirichletMu;
-        System.out.println("dirichletMu = " + dirichletMu);
+        LOG.info("dirichletMu = {}", dirichletMu);
     }
 
     /**

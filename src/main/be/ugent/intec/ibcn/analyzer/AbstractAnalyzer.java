@@ -1,9 +1,13 @@
 package be.ugent.intec.ibcn.analyzer;
 
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.io.DataLoading;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.io.DataLoading;
 
 /**
  * Abstract class with the basics for analyzing location predictions.
@@ -17,6 +21,11 @@ import java.text.NumberFormat;
  */
 public abstract class AbstractAnalyzer {
     
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(AbstractAnalyzer.class);
+	
     /**
      * Numberformat.
      */
@@ -40,7 +49,7 @@ public abstract class AbstractAnalyzer {
     public AbstractAnalyzer(AnalyzerParameters parameters) {
         this.parameters = parameters;
         // Load the test data
-        System.out.println("Loading test from " + parameters.getTestFile());
+        LOG.info("Loading test from {}", parameters.getTestFile());
         DataLoading dl = new DataLoading();
         // Data is loaded WITHOUT feature selection
         this.test_data = dl.loadDataFromFile(parameters.getTestFile(), 

@@ -1,9 +1,16 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides the necessary IO methods to feature related operations.
@@ -11,15 +18,20 @@ import java.util.Map;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class FeaturesIO {
-    
-    /**
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(FeaturesIO.class);
+
+	/**
      * Export a List of features to file.
      * @param features (Ordered) set of features to write to file with their IDs
      * @param filename The filename of the output
      */
     public static void exportFeaturesToFile(List<Object> features, 
             String filename) {
-        System.out.println("Exporting features to file " + filename);
+        LOG.info("Exporting features to file {}", filename);
         try {
             PrintWriter file = new PrintWriter(new FileWriter(filename));
             int index = 0;
@@ -29,8 +41,9 @@ public class FeaturesIO {
             file.close();
         }
         catch (IOException e) {
-            System.err.println("Error writing selected features to file: " 
-                    + e.getMessage());
+            LOG.error("Error writing selected features to file: {}", 
+                e.getMessage());
+            System.exit(1);
         }
     }
     
@@ -42,7 +55,7 @@ public class FeaturesIO {
      */
     public static Map<Object, Integer> loadFeaturesFromFile(String filename, 
             int featuresToRetain) {
-        System.out.println("Loading selected features from file " + filename);
+        LOG.info("Loading selected features from file {}", filename);
         Map<Object, Integer> features = new HashMap<Object, Integer>();
         try {
             // Read from file
@@ -68,12 +81,12 @@ public class FeaturesIO {
                 line = in.readLine();
             }
             in.close();
-            System.out.println("Loaded features: " + features.size() + 
-                    " skipped: "+ skipped +" from " + filename);
+            LOG.info("Loaded features: {} skipped: {} from {}", 
+        		features.size(), skipped, filename);
         }
         catch (IOException e) {
-            System.err.println("Error reading selected features from file: " 
-                    + e.getMessage());
+            LOG.error("Error reading selected features from file: {}", e.getMessage());
+            System.exit(1);
         }
         return features;
     }

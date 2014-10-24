@@ -1,8 +1,5 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -10,13 +7,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.Point;
+import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserMedoid;
+
 /**
  * This class provides the necessary IO methods to read data from file.
  *
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class FileIO {
-    
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(FileIO.class);
+
     /**
      * Find out the number of lines in the given file.
      * The linecount is supposed to be on the first line, if not, the file will
@@ -33,10 +42,10 @@ public class FileIO {
             lines = Integer.parseInt(in.readLine());
             in.close();
         } catch (NumberFormatException e) {
-            System.out.println("Linecount not found on first line. "
+            LOG.info("Linecount not found on first line. "
                     + "Will loop trough the file.");
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
         }
         // Loop through the file to find out the number of lines
         if (lines < 0) {
@@ -49,7 +58,7 @@ public class FileIO {
                 in.close();
                 lines = counter;
             } catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
+                LOG.error("IOException: {}", e.getMessage());
             }
         }
         // Throw an exception in case something went wrong
@@ -82,10 +91,10 @@ public class FileIO {
             }            
             in.close();
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
         }
-        System.out.println("Loading medoids from " + filename + 
-                ". Loaded medoids: " + medoids.size());
+        LOG.info("Loading medoids from {}. Loaded medoids: {}",
+        		filename, medoids.size());
         return medoids;
     }
     
@@ -99,6 +108,6 @@ public class FileIO {
                 delete(c);
         }
         if (!f.delete())
-            System.err.println("Failed to delete file: " + f);
+            LOG.error("Failed to delete file: {}", f);
     }
 }

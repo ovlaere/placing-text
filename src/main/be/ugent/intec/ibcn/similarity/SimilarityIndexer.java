@@ -1,16 +1,33 @@
 package be.ugent.intec.ibcn.similarity;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.classifier.NaiveBayesResults;
 import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParser;
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParserDataItemSimilarity;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * SimilarityIndexer: creates similarity index on file, grouped by class IDs
@@ -24,6 +41,11 @@ import java.util.concurrent.*;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class SimilarityIndexer {
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(SimilarityIndexer.class);
 
     /**
      * Constant containing the number of processors available in the system.
@@ -114,8 +136,8 @@ public class SimilarityIndexer {
                 .getUsedClasses());        
         try {
             // Print some info
-            System.out.println("Scanning classId... ("+ used_classIds.size() + 
-                    " used classIds) from " + parameters.getTrainingFile());
+            LOG.info("Scanning classId... ({} used classIds) from {}", 
+            		used_classIds.size(), parameters.getTrainingFile());
             // Fetch the number of lines to process
             int lines = FileIO.getNumberOfLines(parameters.getTrainingFile());
             // Determine the number of lines to process in case a limit was set
@@ -185,12 +207,11 @@ public class SimilarityIndexer {
             // Close the input
             in.close();
             // Report some stats
-            System.out.println("Scan time: " + 
-                    (System.currentTimeMillis() - t1) + 
-                    ", training items in classes: " + id_class_map.size());
+            LOG.info("Scan time: {}, training items in classes: {}",
+            		(System.currentTimeMillis() - t1), id_class_map.size());
         }
         catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }
@@ -209,8 +230,8 @@ public class SimilarityIndexer {
         // Until all classes are processed - we need to be process within the
         // OPEN_FILE_LIMIT
         while (class_count_map.size() > 0) {
-            System.out.println("Creating index for " + class_count_map.size() + 
-                    " remaining classes, batch size: " + open_file_limit);
+            LOG.info("Creating index for {} remaining classes, batch size: {}",
+            		class_count_map.size(), open_file_limit);
             // Determine what we can do in this batch
             Set<Integer> classesInCurrentBatch = new HashSet<Integer>();
             try {
@@ -265,12 +286,12 @@ public class SimilarityIndexer {
                     line = in.readLine();
                     // report progress after 1M items
                     if (++counter % 1000000 == 0)
-                        System.out.println(counter + " training items without tags: " + noTags);
+                        LOG.info("{}\ttraining items without tags: {}", counter, noTags);
                     // In case we hit the global linelimit
                     if (counter == linelimit)
                         break;
                 }      
-                System.out.println("Training data without tags: " + noTags);
+                LOG.info("Training data without tags: {}", noTags);
                 // Close the input
                 in.close();
                 // Close all the open files
@@ -280,7 +301,7 @@ public class SimilarityIndexer {
                 }
             }
             catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
+                LOG.error("IOException: {}", e.getMessage());
                 e.printStackTrace();
                 System.exit(1);
             }
@@ -291,7 +312,7 @@ public class SimilarityIndexer {
         // Stop the timer
         long t2 = System.currentTimeMillis();
         // Print stats
-        System.out.println("All done. [ "+(t2-t1)+" ms]");
+        LOG.info("All done. [ {} ms.]", (t2-t1));
     }
     
     /**
@@ -400,14 +421,14 @@ public class SimilarityIndexer {
                 }
                 // Report updates after processing 1M lines
                 if ((start + burst) % 1000000 == 0)
-                    System.out.println(start + burst);
+                    LOG.info("{}", (start + burst));
             }
             catch (IOException e) {
                 e.printStackTrace();
                 System.exit(-1);
             }
             catch (Exception e) {
-                System.err.println("Exception: " + e.getMessage());
+                LOG.error("Exception: {}", e.getMessage());
                 e.printStackTrace();
             }
             // Clear the local data cache
@@ -517,7 +538,7 @@ public class SimilarityIndexer {
             // Close the input
             in.close();
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
         }
         return data;
     }

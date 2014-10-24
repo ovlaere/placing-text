@@ -1,13 +1,17 @@
 package be.ugent.intec.ibcn.analyzer;
 
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 
 /**
  * This class demonstrates how a simple analyzer for location predictions is
@@ -29,6 +33,11 @@ import java.util.List;
  */
 public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(DistanceThresholdAnalyzer.class);
+	
     /**
      * Object capable of finding the closest class for a given test ID.
      */
@@ -77,7 +86,7 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
         this.classCorrect = 0;
         // Init processed counter
         this.processed = 0;
-        System.out.println("Processing..." );
+        LOG.info("Processing..." );
         try {
             // Read the predictions
             BufferedReader in = new BufferedReader(new FileReader(filename));
@@ -128,8 +137,8 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
             // Report the results
             results(tmp_distances, filename);
         }
-        catch (IOException ex) {
-            System.err.println("IOException: " + ex.getMessage());
+        catch (IOException e) {
+            LOG.error("IOException: {}", e.getMessage());
         }
     }
     
@@ -152,31 +161,30 @@ public class DistanceThresholdAnalyzer extends AbstractAnalyzer {
                 distance = tmp_distances.get(tmp_distances.size() / 2);
             }
         }
-        System.out.print(filename + "\t");
+        LOG.info(filename + "\t");
         for (int i = 0; i < this.distances.length; i++)
-            System.out.print(formatter.format(counters[i] * 100. / processed) + 
-                    "\t");
-        System.out.println(formatter.format(distance));
-        System.out.println("");
+            LOG.info(formatter.format(counters[i] * 100. / processed) + "\t");
+        LOG.info(formatter.format(distance));
+        LOG.info("");
         // If there was a need for accuracy on clustering level
         if (this.nmf != null) {
             // Report the accuracy at the clustering level
-            System.out.println("Acc "+ parameters.getClassMapper().size() +
+        	LOG.info("Acc "+ parameters.getClassMapper().size() +
                     ":\t" + 
                     classCorrect+"\t"+processed+"\t"+ 
                     formatter.format(classCorrect * 100. / processed));
-            System.out.println("");
+        	LOG.info("");
         }
         // Report the distance stats
         for (int i = 0; i < this.distances.length; i++)
-            System.out.println(this.distances[i] + "\t" + 
+        	LOG.info(this.distances[i] + "\t" + 
                     formatter.format(counters[i] * 100. / processed) + "\t"+
                     counters[i]+"\t"+processed);
         // Report quartile statistics
-        System.out.println(filename + " Q1\t" + formatter.format(
+        LOG.info(filename + " Q1\t" + formatter.format(
                 tmp_distances.get((int)(tmp_distances.size()*0.25))));
-        System.out.println(filename + " Q2\t" + formatter.format(distance));
-        System.out.println(filename + " Q3\t" + formatter.format(
+        LOG.info(filename + " Q2\t" + formatter.format(distance));
+        LOG.info(filename + " Q3\t" + formatter.format(
                 tmp_distances.get((int)(tmp_distances.size()*0.75))));
     }
 }

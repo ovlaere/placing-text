@@ -1,10 +1,14 @@
 package be.ugent.intec.ibcn.geo.clustering;
 
-import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
-import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
+import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 
 /**
  * This class provides the generic (and common) functionality of the clustering
@@ -29,13 +33,18 @@ import java.util.Random;
  */
 public abstract class AbstractClustering {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(AbstractClustering.class);
+	
     /**
      * Constant storing the amount of available processors on the system.
      */
     protected static final int NR_THREADS = 
             Runtime.getRuntime().availableProcessors();
     {
-        System.out.println("[ Available CPU's: " + NR_THREADS + " ]");
+        LOG.info("[ Available CPU's: {} ]", NR_THREADS);
     }
     
     /**

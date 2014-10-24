@@ -1,5 +1,18 @@
 package be.ugent.intec.ibcn.geo.clustering;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
 import be.ugent.intec.ibcn.geo.clustering.datatypes.InitialPoint;
 import be.ugent.intec.ibcn.geo.common.datatypes.Coordinate;
@@ -8,9 +21,6 @@ import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This class contains an optimized implementation of the Partition Around 
@@ -33,6 +43,11 @@ import java.util.concurrent.Executors;
  */
 public class PamClustering extends AbstractClustering {
     
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(PamClustering.class);
+	
     /**
      * Variable keeping track of changed clusters during the process.
      */
@@ -107,7 +122,7 @@ public class PamClustering extends AbstractClustering {
      */
     @Override
     public void cluster(String outputfile) {
-        System.out.println("[PAM] Output will be written in " + outputfile);
+        LOG.info("[PAM] Output will be written in {}", outputfile);
         // Init a random generator - with seed for reproduceability
         Random rg = new Random(123456789L);
         // Init a ClusteringIO
@@ -127,8 +142,8 @@ public class PamClustering extends AbstractClustering {
          * Step 1. Initialize: randomly select k of the n data points as the
          * mediods.
          */
-        System.out.println("[PAM][Algorithm][Step 1] Initial medoid selection. "
-                + "(#"+ numberOfClusters + ")");
+        LOG.info("[PAM][Algorithm][Step 1] Initial medoid selection. "
+                + "(# {})", numberOfClusters);
         // Provide a map to track the current medoids
         Map<Integer, InitialPoint> medoids = 
                 new HashMap<Integer, InitialPoint>(numberOfClusters);
@@ -153,8 +168,8 @@ public class PamClustering extends AbstractClustering {
                     if (p.distance(medoids.get(nbrs.get(0))) <= 1E-3)
                         // Reject it as a valid candidate
                         valid_candidate = false;                    
-                } catch (KeySizeException ex) {
-                    System.err.println("Error: " + ex.getMessage());
+                } catch (KeySizeException e) {
+                    LOG.error("Error: {}", e.getMessage());
                 }
             }
             // If we could add it
@@ -165,20 +180,20 @@ public class PamClustering extends AbstractClustering {
                 points.remove(index);
                 try {
                     initial_kd.insert(new Coordinate(p).doubleKey(), p.getId());
-                } catch (KeySizeException ex) {
-                    System.err.println("Error: " + ex.getMessage());
-                } catch (KeyDuplicateException ex) {
-                    System.err.println("Error: " + ex.getMessage());
+                } catch (KeySizeException e) {
+                    LOG.error("Error: {}", e.getMessage());
+                } catch (KeyDuplicateException e) {
+                    LOG.error("Error: {}", e.getMessage());
                 }
             }
             // Report progress per 10 000 medoids
             if (medoids.size() % 10000 == 0)
-                System.out.println(medoids.size());
+                LOG.info("{}", medoids.size());
         }
         // Stop the timer - Init complete
         long stop = System.currentTimeMillis();
-        System.out.println(" - Selected " + medoids.size() + " medoids. (Time: "
-                + (stop - start) + " ms.)");
+        LOG.info(" - Selected {} medoids. (Time: {} ms.)", 
+        		medoids.size(), (stop - start));
         // Create a list of the current clusters
         List<Cluster> clusters = new ArrayList<Cluster>();
         for (Point point : medoids.values()) {
@@ -196,15 +211,15 @@ public class PamClustering extends AbstractClustering {
             iteration_start = System.currentTimeMillis();
             // Clear any possible change flags
             resetChangeFlags();
-            System.out.println("\n========] Iteration " + ++iterations + 
-                    " [========\n");
+            LOG.info("\n========] Iteration {} [========\n", 
+            		++iterations);
             start = System.currentTimeMillis();
             for (Cluster cluster : clusters) {
                 // Remove all data points
                 cluster.clearElements();
             }
-            System.out.println("[PAM][Algorithm][Step 2] Assigning " + 
-                    points.size() + " datapoints to the closest medoid.");
+            LOG.info("[PAM][Algorithm][Step 2] Assigning {} datapoints "
+            		+ "to the closest medoid.", points.size());
 
             // make a D-dimensional KD-tree
             KDTree<Integer> kd = new KDTree<Integer>(3);
@@ -213,15 +228,15 @@ public class PamClustering extends AbstractClustering {
                     // Insert each medoid
                     Point center = clusters.get(i).getCenter();
                     kd.insert(new Coordinate(center).doubleKey(), i);
-                } catch (KeySizeException ex) {
-                    System.err.println("Error: " + ex.getMessage());
-                } catch (KeyDuplicateException ex) {
-                    System.err.println("Error: " + ex.getMessage());
+                } catch (KeySizeException e) {
+                    LOG.error("Error: {}", e.getMessage());
+                } catch (KeyDuplicateException e) {
+                    LOG.error("Error: {}", e.getMessage());
                 }
             }
 
             // For each data point, find the nearest neighbour
-            for (Point p  : points) {
+            for (Point p : points) {
                 try {
                     List<Integer> nbrs = kd.nearest(
                             new Coordinate(p).doubleKey(), 1);
@@ -229,8 +244,8 @@ public class PamClustering extends AbstractClustering {
                     Cluster best_cluster = clusters.get(nbrs.get(0));
                     // Add this element to that cluster
                     best_cluster.addElement(p);
-                } catch (KeySizeException ex) {
-                    System.err.println("Error: " + ex.getMessage());
+                } catch (KeySizeException e) {
+                    LOG.error("Error: {}", e.getMessage());
                 }
             }
             // Calculate checksum - just for sanity
@@ -239,15 +254,15 @@ public class PamClustering extends AbstractClustering {
                 before_checksum += cluster.size();
             }
             // Print checksum
-            System.out.println("Checksum: " + before_checksum);
+            LOG.info("Checksum: {}", before_checksum);
             // Mark timer just for stats purposes
             stop = System.currentTimeMillis();
-            System.out.println(" - Done. (" + (stop - start) + " ms.)");
+            LOG.info(" - Done. ({} ms.)", (stop - start));
 
             /*
              * Step 3. For each mediod m
              */
-            System.out.println("[PAM][Algorithm][Step 3] Improving cluster "
+            LOG.info("[PAM][Algorithm][Step 3] Improving cluster "
                     + "configurations.");
             // Create a thread pool
             ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
@@ -265,15 +280,15 @@ public class PamClustering extends AbstractClustering {
             // Stop the iteration time here
             long iteration_stop = System.currentTimeMillis();
             // and start over again with step 2
-            System.out.println("[PAM][Algorithm] Iteration finished in "
-                            + (iteration_stop - iteration_start) + " ms.");
-            System.out.println(" - " + getClusterChanges()
-                            + " clusters changed during iteration.");
+            LOG.info("[PAM][Algorithm] Iteration finished in {} ms.",
+            		(iteration_stop - iteration_start));
+            LOG.info(" - {} clusters changed during iteration.",
+            		getClusterChanges());
             int after_checksum = 0;
             for (Cluster cluster : clusters) {
                 after_checksum += cluster.size();
             }
-            System.out.println("Checksum: " + after_checksum);
+            LOG.info("Checksum: {}", after_checksum);
             // This should not happen, unless we have threading issues!
             if (before_checksum != after_checksum) {
                 throw new RuntimeException("Checksum differs before and after "
@@ -319,10 +334,10 @@ public class PamClustering extends AbstractClustering {
                     clusters = new_clusters;
                     // Flag a change so that a new iteration will be required
                     flagChange();
-                    System.out.println("\n++++ > Clusters below threshold ("
-                                + clusters_below.size() + ") < ++++");
-                    System.out.println("++++ > \tMerging Clusters (clusters: "
-                                + clusters.size() + ")\t < ++++\n");
+                    LOG.info("\n++++ > Clusters below threshold ({}) < ++++", 
+                    		clusters_below.size());
+                    LOG.info("++++ > \tMerging Clusters (clusters: {})\t < ++++\n", 
+                    		clusters.size());
                 }
             }
             // Write the current iteration to the result file, just in case
@@ -375,23 +390,21 @@ public class PamClustering extends AbstractClustering {
                 parameters.isWriteFullClusteringToFile());
 
         // Print some stats
-        System.out.println("[PAM] Clustering summary");
-        System.out.println(" - Finished after " + iterations
-                        + " iterations.");
-        System.out.println(" - Total clusters: " + clusters.size());
-        System.out.println(" - Empty clusters: " + empty_clusters);
-        System.out.println(" - Clusters < " + 
-                ((PamParameters)parameters).min_cluster_size + ": "
-                        + clusters_threshold);
+        LOG.info("[PAM] Clustering summary");
+        LOG.info(" - Finished after {} iterations.", iterations);
+        LOG.info(" - Total clusters: {}", clusters.size());
+        LOG.info(" - Empty clusters: {}", empty_clusters);
+        LOG.info(" - Clusters < {} : {}", 
+    		((PamParameters)parameters).min_cluster_size, clusters_threshold);
         if (clusters.size() - empty_clusters != 0)
-            System.out.println(" - Avg cluster size (non-empty): " + 
-                    ((int) ((points.size() * 1.0) + clusters.size()) / 
+            LOG.info(" - Avg cluster size (non-empty): {}",
+            		((int) ((points.size() * 1.0) + clusters.size()) / 
                     (clusters.size() - empty_clusters)));
-        System.out.println(" - Min cluster size (>0): " + min_size);
-        System.out.println(" - Max cluster size: " + max_size);
-        System.out.println("[=======================]");
-        System.out.println(" Overall processing time: "
-                        + (overall_stop - overall_start) + " ms.");
+        LOG.info(" - Min cluster size (>0): {}", min_size);
+        LOG.info(" - Max cluster size: {}", max_size);
+        LOG.info("[=======================]");
+        LOG.info(" Overall processing time: {} ms.",
+            (overall_stop - overall_start));
     }
     
     /**
@@ -432,9 +445,9 @@ public class PamClustering extends AbstractClustering {
         @Override        
         protected boolean finalSwap(Point bestCenter, Cluster cluster, 
             double original_cost, double cost) {
-            System.out.println("[Thread-" + Thread.currentThread().getId() + 
-                    "] " + cluster.getCenter() + " -> " + bestCenter +
-                    " (Cost: " + original_cost + " -> " + cost + " )");
+            LOG.info("[Thread-{}] {} -> {} (Cost: {} -> {})",
+        		Thread.currentThread().getId(), 
+        		cluster.getCenter(), bestCenter, original_cost, cost);
             
             // Process the change in the dataset we are using by removin the 
             // point that becomes the new center

@@ -1,15 +1,23 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
-import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
+import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.Point;
+import be.ugent.intec.ibcn.geo.common.io.parsers.LineParserPoint;
 
 /**
  * This class provides the necessary IO methods to read training data from file,
@@ -37,6 +45,11 @@ import java.util.concurrent.Executors;
  */
 public class ClusteringIO {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(ClusteringIO.class);
+	
     /**
      * Holds the number of available threads.
      */
@@ -76,7 +89,7 @@ public class ClusteringIO {
             long time = System.currentTimeMillis() - t1;
             t1 = System.currentTimeMillis();
             // Print the time it took, just to give an idea on completion time
-            System.out.println(" ( "+time+" ms.)");
+            LOG.info(" ( {} ms.)", time);
         }
     }
     
@@ -100,7 +113,7 @@ public class ClusteringIO {
      */
     public Point[] loadDataFromFile(String filename, String lineparser, 
             int limit) {
-        System.out.println("=| Parser:  " + lineparser);
+        LOG.info("=| Parser: {}", lineparser);
         // Fetch the number of lines to process
         int lines = FileIO.getNumberOfLines(filename);
         // Determine the number of lines to process in case a limit was set
@@ -110,8 +123,8 @@ public class ClusteringIO {
         Point[] data = new Point[lines];
         // Print out the number of lines the code is going to read, and if this
         // is limited by a threshold, print this as well, to enable verification
-        System.out.println("Loading " + lines + " data items..." + 
-                (lines == limit ? " ++ LIMITED BY VARIABLE ++" : ""));
+        LOG.info("Loading {} data items..." + (lines == limit ? " ++ LIMITED BY VARIABLE ++" : ""),
+        		lines);
         // Start the timer
         long start = System.currentTimeMillis();
         this.t1 = start;
@@ -146,7 +159,7 @@ public class ClusteringIO {
         executor.shutdown();
         // Wait until all threads are finish
         while (!executor.isTerminated()) {}
-        System.out.println();
+        LOG.info("");
         // Stop the timer
         long stop = System.currentTimeMillis();
         
@@ -165,10 +178,10 @@ public class ClusteringIO {
                 counter++;
             }
         }
-        System.out.println("Loading complete. Non-null items: "+counter+" (" + 
-                (stop - start) + " ms.).");
-        System.out.println("+ Parser processed: " + parser_processed);
-        System.out.println("+ Parser errors   : " + parser_errors);
+        LOG.info("Loading complete. Non-null items: {} ( {} ms.)",
+        		counter, (stop - start));
+        LOG.info("+ Parser processed: {}", parser_processed);
+        LOG.info("+ Parser errors   : {}", parser_errors);
         
         return data;
     }
@@ -277,8 +290,8 @@ public class ClusteringIO {
                 file.close();
             }
             catch (IOException e){
-                System.out.println("Error loading data: " + e.getMessage());
-                System.exit(0);
+                LOG.error("Error loading data: {}", e.getMessage());
+                System.exit(1);
             }
         }
     }
@@ -319,9 +332,8 @@ public class ClusteringIO {
             file.close();
         }
         catch (IOException e) {
-            System.err.println("Error writing clustering to file: " + 
-                    e.getMessage());
-            System.exit(-1);
+            LOG.error("Error writing clustering to file: {}", e.getMessage());
+            System.exit(1);
         }
     }
     
@@ -361,9 +373,8 @@ public class ClusteringIO {
             file.close();
         }
         catch (IOException e) {
-            System.err.println("Error writing clustering to file: " + 
-                    e.getMessage());
-            System.exit(-1);
+            LOG.error("Error writing clustering to file: {}", e.getMessage());
+            System.exit(1);
         }
     }    
 }

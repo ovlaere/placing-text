@@ -1,8 +1,5 @@
 package be.ugent.intec.ibcn.geo.features;
 
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
-import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +8,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
+import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 
 /**
  * This class implements the ranking of features using Information Gain. 
@@ -22,6 +26,11 @@ import java.util.concurrent.Future;
  */
 public class InformationGainFeatureRanker extends AbstractClassLevelRanker {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(InformationGainFeatureRanker.class);
+	
     /**
      * @return the name of this ranking method
      */
@@ -62,7 +71,7 @@ public class InformationGainFeatureRanker extends AbstractClassLevelRanker {
     public void process(String outputfile) {
         // init overall entropy stuff
         init();
-        System.out.println("Doing "+ getMethodName() +" feature selection.");
+        LOG.info("Doing "+ getMethodName() +" feature selection.");
         // Calculate actual Information Gain for each feature
         Map<Object, Double> information_gain = new HashMap<Object, Double>();
         // Start timer
@@ -90,10 +99,10 @@ public class InformationGainFeatureRanker extends AbstractClassLevelRanker {
                 information_gain.put(result.getFeature(), result.getIG());
                 // Report progress as we go
                 if (++counter % 10000 == 0)
-                    System.out.println(counter);
+                    LOG.info("{}", counter);
             }
             catch (Exception e) {
-                System.err.println("Exception: " + e.getMessage());
+                LOG.error("Exception: {}", e.getMessage());
                 System.exit(1);
             }
         }
@@ -110,8 +119,7 @@ public class InformationGainFeatureRanker extends AbstractClassLevelRanker {
         FeaturesIO.exportFeaturesToFile(features, outputfile);
         // Stop the timer
         long stop = System.currentTimeMillis();
-        System.out.println("Retained features: " + features.size() + 
-                " ("+(stop-start)+" ms.)");
+        LOG.info("Retained features: {} ({} ms.)", features.size(), (stop-start));
     }
 
     /**
@@ -120,7 +128,7 @@ public class InformationGainFeatureRanker extends AbstractClassLevelRanker {
     private void init() {
         // Start the timer
         long t1 = System.currentTimeMillis();
-        System.out.println("Creating overall lookup map");
+        LOG.info("Creating overall lookup map");
         area_feature_count_map = new HashMap<Integer, Map<Object, Integer>>();
         area_totalcount = new HashMap<Integer, Integer>();
         // For each GeoClass - calculate the overall entropy on the fly
@@ -144,7 +152,7 @@ public class InformationGainFeatureRanker extends AbstractClassLevelRanker {
         entropy *= -1;
         // Stop timer
         long t2 = System.currentTimeMillis();
-        System.out.println("Done. time: " + (t2-t1) + " ms.");
+        LOG.info("Done. time: {} ms.", (t2-t1));
     }
     
     /**

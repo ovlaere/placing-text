@@ -15,6 +15,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.classifier.NaiveBayesResults;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
@@ -55,6 +58,11 @@ import be.ugent.intec.ibcn.similarity.SimilarityParameters;
  */
 public class MultiLevelSimilarityReferencer extends AbstractReferencer {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(MultiLevelSimilarityReferencer.class);
+	
     /**
      * Test data, used for sharing between threads.
      */
@@ -88,7 +96,7 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
     @Override
     public void run(String outputFileName) {
         // Load the test data
-        System.out.println("Loading test from " + parameters.get(0).
+        LOG.info("Loading test from {}", parameters.get(0).
                 getTestFile());
         DataLoading dl = new DataLoading();
         // Data is loaded WITHOUT feature selection
@@ -154,7 +162,7 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
             }
         }
 
-        System.out.println("Calculating similarities");
+        LOG.info("Calculating similarities");
         
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
@@ -162,15 +170,12 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
         List<Future<Map<Integer, Point>>> list = 
                 new ArrayList<Future<Map<Integer, Point>>>(); 
         
-        int total_to_process = 0;
         int batches_launched = 0;
         // Loop over the different levels
         for (int i = 0; i < this.parameters.size(); i++) {
             // Print some stats
-            System.out.println("Clustering " + parameters.get(i).
-                    getClassMapper().size() + " for " + class_items[i].size() + 
-                    " classes.");
-            total_to_process += class_items[i].size();
+            LOG.info("Clustering {} : actual used classes {}", parameters.get(i).
+                    getClassMapper().size(), class_items[i].size());
             
             // For each of the classes we need to process for this level
             for (int classId : class_items[i].keySet()) {
@@ -204,7 +209,7 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
             }
             // Report similarity progress every 25 batches
             if (++counter % 25 == 0)
-                System.out.println(counter + "/" + batches_launched);
+                LOG.info("{}/{}", counter, batches_launched);
         }
         // This will make the executor accept no new threads
         // and finish all existing threads in the queue
@@ -274,7 +279,7 @@ public class MultiLevelSimilarityReferencer extends AbstractReferencer {
                         filter.add((String)f);
                 }
                 else {
-                    System.err.println("This should not happen!? " + i);
+                    LOG.error("This should not happen!? {}", i);
                 }
             }
             

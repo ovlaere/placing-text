@@ -1,10 +1,25 @@
 package be.ugent.intec.ibcn.geo.features;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * This class provides the basic Chi Square functionality for feature selection.
@@ -20,6 +35,11 @@ import java.util.concurrent.*;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(ChiSquareFeatureRanker.class);
 
     /**
      * @return the name of this ranking method
@@ -44,7 +64,7 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
      * Actual Chi2 feature selection (and convert it to a ranking).
      */
     public void process(String outputfile) {
-        System.out.println("Doing "+ getMethodName() +" feature selection.");
+        LOG.info("Doing {} feature selection.", getMethodName());
         // Start timer
         long start = System.currentTimeMillis();
         // Prepare an array of lists, for each GeoClass the feature ranking
@@ -86,8 +106,7 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
         FeaturesIO.exportFeaturesToFile(features, outputfile);
         // Stop the timer
         long stop = System.currentTimeMillis();
-        System.out.println("Retained features: " + features.size() + 
-                " ("+(stop-start)+" ms.)");
+        LOG.info("Retained features: {} ({} ms.)", features.size(), (stop-start));
     }
 
     /**
@@ -189,7 +208,8 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
                 N = a+b+c+d;
             }
             else if ((a+b+c+d) != N)
-                System.out.println((a+b+c+d));
+                LOG.warn("Chi2 partial scores don't sum to {}. {} != {}", 
+            		N, (a+b+c+d), N);
 
             double ad = a*d;
             double cb = c*b;
@@ -205,19 +225,20 @@ public class ChiSquareFeatureRanker extends AbstractClassLevelRanker {
             double chi_square_value = nominator / (denominator);
             // old debug code
             if (chi_square_value < 0) {
-                System.out.println(a*d);
-                System.out.println(c*b);
-                System.out.println((a*d-c*b));
-                System.out.println(Math.pow((a*d-c*b),2));
-                System.out.println(N*Math.pow((a*d-c*b),2));
-                System.out.println((a+c));
-                System.out.println((b+d));
-                System.out.println((a+b));
-                System.out.println((c+d));
-                System.out.println((a+c)*(b+d));
-                System.out.println((a+b)*(c+d));
-                System.out.println((a+c)*(b+d)*(a+b)*(c+d));
-                System.out.println(denominator);
+            	LOG.warn("Chi2 value smaller than zero observed: {}", chi_square_value);
+                LOG.debug("{}", a*d);
+                LOG.debug("{}", c*b);
+                LOG.debug("{}", (a*d-c*b));
+                LOG.debug("{}", Math.pow((a*d-c*b),2));
+                LOG.debug("{}", N*Math.pow((a*d-c*b),2));
+                LOG.debug("{}", (a+c));
+                LOG.debug("{}", (b+d));
+                LOG.debug("{}", (a+b));
+                LOG.debug("{}", (c+d));
+                LOG.debug("{}", (a+c)*(b+d));
+                LOG.debug("{}", (a+b)*(c+d));
+                LOG.debug("{}", (a+c)*(b+d)*(a+b)*(c+d));
+                LOG.debug("{}", denominator);
             }
             results.put(feature, chi_square_value);
         }

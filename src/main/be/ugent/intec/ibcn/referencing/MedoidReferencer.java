@@ -1,12 +1,16 @@
 package be.ugent.intec.ibcn.referencing;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.classifier.NaiveBayesResults;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.io.DataLoading;
 import be.ugent.intec.ibcn.geo.common.io.ReferencingIO;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Actual implementation of a Medoid based georeferencer.
@@ -24,6 +28,11 @@ import java.util.TreeMap;
  */
 public class MedoidReferencer extends AbstractReferencer{
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(MedoidReferencer.class);
+
     /**
      * Constructor.
      * @param parameters Parameters for referencing.
@@ -39,7 +48,7 @@ public class MedoidReferencer extends AbstractReferencer{
     @Override
     public void run(String outputFileName) {
         // Load the test data
-        System.out.println("Loading test from " + parameters.getTestFile());
+        LOG.info("Loading test from {}", parameters.getTestFile());
         DataLoading dl = new DataLoading();
         // Data is loaded WITHOUT feature selection (features = null)
         DataItem [] test_data = dl.loadDataFromFile(parameters.getTestFile(), 

@@ -1,15 +1,28 @@
 package be.ugent.intec.ibcn.geo.features;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * This class contains an algorithm to rank features based
@@ -38,6 +51,11 @@ import java.util.concurrent.*;
  * The parameter BATCH size can be set using the BATCH_LIMIT static variable.
  */
 public class GeoSpreadFeatureRanker {
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(GeoSpreadFeatureRanker.class);
 
     /**
      * Number of threads, for multi-threaded processing.
@@ -181,9 +199,9 @@ public class GeoSpreadFeatureRanker {
      */
     public void process(String inputFile, String lineparserClassName, int limit,
             String outputfile) {
-        System.out.println("Doing "+ getMethodName() +" feature selection.");
+        LOG.info("Doing {} feature selection.", getMethodName());
         // Publish the batch limit value
-        System.out.println("BATCH LIMIT " + batch_limit);
+        LOG.info("BATCH LIMIT {}", batch_limit);
         // Instantiate the parser
         AbstractLineParserDataItem parser = 
                 (AbstractLineParserDataItem)Util.getParser(lineparserClassName);
@@ -219,7 +237,7 @@ public class GeoSpreadFeatureRanker {
             // 
             tmpstats = new ArrayList<HashMap<CellPoint,Integer>>(lines);
             
-            System.out.println("Reading and parsing lines from datafile: " + 
+            LOG.info("Reading and parsing lines from datafile: " + 
                     (limit > 0 && limit < lines ? limit + 
                     " ++ LIMITED BY VARIABLE ++" : lines));
             // Read the training data
@@ -309,9 +327,9 @@ public class GeoSpreadFeatureRanker {
                         long stop = System.currentTimeMillis();
                         // Print time, total unique features so far, and the 
                         // number of batches it will take to process them
-                        System.out.println("-> " + counter + "\tTime: " + 
-                                (stop-start) + "\tFeatures: " + superset.size() 
-                                + " ("+(superset.size()/batch_limit) + ")");
+                        LOG.info("-> {}\tTime: {}\tFeatures: {} ({})",
+                    		counter, (stop-start), superset.size(), 
+                    		(superset.size()/batch_limit));
                         start = System.currentTimeMillis();
                     }
                 }
@@ -331,7 +349,7 @@ public class GeoSpreadFeatureRanker {
             }
         }
         catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
             System.exit(1);
         }
         // At this point, we have tracked all features for the current batch
@@ -352,11 +370,11 @@ public class GeoSpreadFeatureRanker {
                 batchcounter++;
                 BufferedReader in = new BufferedReader(
                         new FileReader(inputFile));
-                System.out.println("//========================================"
+                LOG.info("//========================================"
                         + "\\\\");
-                System.out.println("\tExtra batch " + batchcounter + "/" + 
+                LOG.info("\tExtra batch {}/{}", batchcounter, 
                         additional_batches.size());
-                System.out.println("\\\\======================================"
+                LOG.info("\\\\======================================"
                         + "==//");
                 counter = 0;
                 // Prepare tools for this batch
@@ -415,8 +433,7 @@ public class GeoSpreadFeatureRanker {
                         counter++;
                         if (counter % REPORT_SIZE_LOAD == 0) {
                             long stop = System.currentTimeMillis();
-                            System.out.println("-> " + counter + "\tTime: " + 
-                                    (stop-start));
+                            LOG.info("-> {}\tTime: {}", counter, (stop-start));
                             start = System.currentTimeMillis();
                         }
                     }
@@ -427,7 +444,7 @@ public class GeoSpreadFeatureRanker {
                 in.close();
             }
             catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
+                LOG.error("IOException: {}", e.getMessage());
                 System.exit(1);
             }
             // Again, at this point, we have tracked all features for the 
@@ -440,7 +457,7 @@ public class GeoSpreadFeatureRanker {
         // overall spread scores
         
         // Actual feature ranking
-        System.out.println("Sorting...");
+        LOG.info("Sorting...");
         // Sort the map by value ascending
         spread_map = Util.sortByValueAscending(spread_map);
         // Fetch the features
@@ -465,11 +482,10 @@ public class GeoSpreadFeatureRanker {
         // locking
         this.stats = tmpstats.toArray(new HashMap[0]);
         
-        System.out.println("Total features: " +this.feature_id.keySet().size());
+        LOG.info("Total features: {}", this.feature_id.keySet().size());
         // Notify how many batches will follow
         if(batches_to_follow > 0)
-            System.out.println(" - will process " + batches_to_follow + 
-                    " more batches...");
+            LOG.info(" - will process {} more batches...", batches_to_follow);
 
         // Create an executor service and process things with multiple threads
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
@@ -505,7 +521,7 @@ public class GeoSpreadFeatureRanker {
                 // Report progress as needed
                 if ((resultcounter * thread_batch_size) % 
                         REPORT_SIZE_PROCESS == 0)
-                    System.out.println((resultcounter * thread_batch_size));
+                    LOG.info("{}", (resultcounter * thread_batch_size));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {

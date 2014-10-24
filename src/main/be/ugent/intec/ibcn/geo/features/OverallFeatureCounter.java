@@ -1,10 +1,22 @@
 package be.ugent.intec.ibcn.geo.features;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.ClassMapper;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * This class provides a map with the unique features found in the training data
@@ -14,6 +26,11 @@ import java.util.concurrent.*;
  */
 public class OverallFeatureCounter {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(OverallFeatureCounter.class);
+	
     /**
      * Constant containing the number of processors available in the system.
      */
@@ -65,7 +82,7 @@ public class OverallFeatureCounter {
      * @param data Reference to the loaded training data
      */
     public OverallFeatureCounter(ClassMapper classmapper, DataItem [] data) {
-        System.out.println("Generating overall feature count table");
+        LOG.info("Generating overall feature count table");
         this.map = new HashMap<Object, Integer>();
         this.data = data;
         // Prepare the thread pool and the list for the futures
@@ -105,7 +122,7 @@ public class OverallFeatureCounter {
         executor.shutdown();
         // Wait until all threads are finish
         while (!executor.isTerminated()) {}
-        System.out.println("Done. Mapped features: " + map.size());
+        LOG.info("Done. Mapped features: {}", map.size());
     }
     
     /**

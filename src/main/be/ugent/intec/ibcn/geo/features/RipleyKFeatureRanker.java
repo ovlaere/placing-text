@@ -1,5 +1,25 @@
 package be.ugent.intec.ibcn.geo.features;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.Coordinate;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
@@ -10,13 +30,13 @@ import be.ugent.intec.ibcn.geo.common.io.FileIO;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
 
 public class RipleyKFeatureRanker{
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(RipleyKFeatureRanker.class);
 
     /**
      * Number of threads, for multi-threaded processing.
@@ -158,7 +178,7 @@ public class RipleyKFeatureRanker{
     public void process(String outputfile, double power, int method) {
         // Set the method for ranking
         this.method = method;
-        System.out.println("Doing "+ getMethodName() +" feature selection.");
+        LOG.info("Doing {} feature selection.", getMethodName());
         // Get the occurrences of the features
         Map<String, List<Point>> feature_occurrences = getFeatureOccurrences();
         // Get the default K-scores for the features, using a value for the 
@@ -231,11 +251,11 @@ public class RipleyKFeatureRanker{
             while (!executor.isTerminated()) {}            
             // Close the input
             in.close();
-            System.out.println("Features procssed: " + feature_occurrences.size());
+            LOG.info("Features procssed: {}", feature_occurrences.size());
         } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+            LOG.error("IOException: {}", e.getMessage());
         } catch (Exception e) {
-            System.err.println("Exception: " + e.getMessage());
+            LOG.error("Exception: {}", e.getMessage());
             System.exit(1);
         }
         // return the features and their occurrences
@@ -288,7 +308,7 @@ public class RipleyKFeatureRanker{
                 feature_score.putAll(future.get());
                 // Report progress every 10K features
                 if (++processed % 10000 == 0)
-                    System.out.println(processed);
+                    LOG.info("{}", processed);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -354,7 +374,7 @@ public class RipleyKFeatureRanker{
                 synchronized(fileLock) {
                     // Report some stats if we have processed 1M lines
                     if (start > 0 && start % 1000000 == 0)
-                        System.out.println("["+ start+"]");
+                        LOG.info("[{}]", start);
                     int counter = 0;
                     // Load a BURST of data
                     String line;
@@ -366,7 +386,7 @@ public class RipleyKFeatureRanker{
                     while (line != null && ++counter < burst);
                 }
             } catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
+                LOG.error("IOException: {}", e.getMessage());
             }
             // Set up the parser
             LineParserDataItem parser = 
@@ -448,19 +468,17 @@ public class RipleyKFeatureRanker{
             // Prepare a map for duplicates in the KD mapping
             Map<Integer, Set<Integer>> duplicate_mapping 
                     = new HashMap<Integer, Set<Integer>>();
-            // Just track the number of duplicate points.
-            int duplicateCount = 0;
             // Init the KD tree
             KDTree<Integer> kd = new KDTree<Integer>(3);
             for (Point p : feature_occurrences) {
                 try {
                     // Insert each of the points in the KD tree
                     kd.insert(new Coordinate(p).doubleKey(), p.getId());
-                } catch (KeySizeException ex) {
-                    System.err.println("Error: " + ex.getMessage());
+                } catch (KeySizeException e) {
+                    LOG.error("Error: {}", e.getMessage());
                 }
                 // if the key already exists
-                catch (KeyDuplicateException ex) {
+                catch (KeyDuplicateException e) {
                     try {
                         // Fetch the id of the original item that this one
                         // is a duplicate of
@@ -477,10 +495,8 @@ public class RipleyKFeatureRanker{
                         ids.add(p.getId());
                         // Put the set with this duplicate
                         duplicate_mapping.put(duplicate_id, ids);
-                        // Keep track of stats
-                        duplicateCount++;
-                    } catch (KeySizeException ex2) {
-                        System.err.println("Error: " + ex.getMessage());
+                    } catch (KeySizeException e2) {
+                        LOG.error("Error: {}" + e2.getMessage());
                     }
                 }
             }
@@ -524,8 +540,8 @@ public class RipleyKFeatureRanker{
             try {
                 // Fetch all points within bounds
                 neighbours = kd.range(lower_bounds, upper_bounds);
-            } catch (KeySizeException ex) {
-                System.err.println("Error: " + ex.getMessage());
+            } catch (KeySizeException e) {
+                LOG.error("Error: {}", e.getMessage());
             }
             // Copy the current set of neigbhours
             Set<Integer> nbrs_copy = new HashSet<Integer>(neighbours);

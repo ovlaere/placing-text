@@ -1,13 +1,21 @@
 package be.ugent.intec.ibcn.geo.clustering;
 
-import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
-import be.ugent.intec.ibcn.geo.common.datatypes.Point;
-import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.clustering.datatypes.Cluster;
+import be.ugent.intec.ibcn.geo.common.datatypes.Point;
+import be.ugent.intec.ibcn.geo.common.io.ClusteringIO;
 
 /**
  * This class provides the implementation of the grid clustering algorithm.
@@ -29,6 +37,11 @@ import java.util.concurrent.*;
  */
 public class GridClustering extends AbstractClustering {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(GridClustering.class);
+	
     /**
      * Precision (in degrees) latitude of the grid rows.
      */
@@ -134,8 +147,8 @@ public class GridClustering extends AbstractClustering {
         }
 
         // Now, start optimizing each of the individual clusters
-        System.out.println("Determined "+ clusters.size() +" clusters...");
-        System.out.println("Optimizing clusters...");
+        LOG.info("Determined {} clusters...", clusters.size());
+        LOG.info("Optimizing clusters...");
 
         int cluster_counter = 0;
         int min_size = Integer.MAX_VALUE;
@@ -160,11 +173,12 @@ public class GridClustering extends AbstractClustering {
         for (int i = 0; i < threads.size(); i++) {
             try {
                 threads.get(i).join();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+            } catch (InterruptedException e) {
+            	LOG.error("InterruptedException: {}", e.getMessage());
+                e.printStackTrace();
             }
             if (i > 0 && i % 100 == 0)
-                System.out.println(" " + i);
+                LOG.info(" {}", i);
         }
         // This will make the executor accept no new threads
         // and finish all existing threads in the queue
@@ -173,13 +187,13 @@ public class GridClustering extends AbstractClustering {
         while (!executor.isTerminated()) {}
 
         // Print some stats
-        System.out.println("Size check: " + size_check);
-        System.out.println("[Grid Clustering] Clustering summary");
-        System.out.println(" - Grid precision: " + grid_precision_rows);
-        System.out.println(" - Total clusters: " + cluster_counter);
-        System.out.println(" - Min cluster size (>0): " + min_size);
-        System.out.println(" - Max cluster size: " + max_size);
-        System.out.println("[=======================]");
+        LOG.info("Size check: {}", size_check);
+        LOG.info("[Grid Clustering] Clustering summary");
+        LOG.info(" - Grid precision: {}", grid_precision_rows);
+        LOG.info(" - Total clusters: {}", cluster_counter);
+        LOG.info(" - Min cluster size (>0): {}", min_size);
+        LOG.info(" - Max cluster size: {}", max_size);
+        LOG.info("[=======================]");
 
         // Write to file
         ClusteringIO cio = new ClusteringIO();
@@ -190,8 +204,8 @@ public class GridClustering extends AbstractClustering {
         long overall_stop = System.currentTimeMillis();
 
         // Print final stats
-        System.out.println(" Overall processing time: " + 
-                (overall_stop - overall_start) + " ms.");
+        LOG.info(" Overall processing time: {} ms.", 
+        		(overall_stop - overall_start));
     }
 
     /**
@@ -258,7 +272,7 @@ public class GridClustering extends AbstractClustering {
                 }
             }
             catch (Exception e) {
-                System.err.println("Exception: " + e.getMessage());
+                LOG.error("Exception: {}", e.getMessage());
                 // Crash and burn
                 e.printStackTrace();
                 System.exit(1);

@@ -1,13 +1,21 @@
 package be.ugent.intec.ibcn.geo.features;
 
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
-import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
+import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 
 /**
  * This class extends the Chi Square functionality for feature ranking in such
@@ -23,6 +31,11 @@ import java.util.concurrent.*;
  */
 public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(MaxChiSquareFeatureRanker.class);
+	
     /**
      * @return the name of this ranking method
      */
@@ -48,7 +61,7 @@ public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
      */
     @Override
     public void process(String outputfile) {
-        System.out.println("Doing "+ getMethodName() +" feature selection.");
+        LOG.info("Doing {} feature selection.", getMethodName());
         // Start timer
         long start = System.currentTimeMillis();        
         // Prepare a map with the overall best scores and features
@@ -103,7 +116,6 @@ public class MaxChiSquareFeatureRanker extends ChiSquareFeatureRanker {
         FeaturesIO.exportFeaturesToFile(features, outputfile);
         // Stop the timer
         long stop = System.currentTimeMillis();
-        System.out.println("Retained features: " + features.size() + 
-                " ("+(stop-start)+" ms.)");
+        LOG.info("Retained features: {} ({} ms.)", features.size(), (stop-start));
     }
 }

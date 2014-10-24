@@ -1,5 +1,23 @@
 package be.ugent.intec.ibcn.referencing;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.classifier.NaiveBayesResults;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.Point;
@@ -9,9 +27,6 @@ import be.ugent.intec.ibcn.similarity.SimilarItem;
 import be.ugent.intec.ibcn.similarity.Similarity;
 import be.ugent.intec.ibcn.similarity.SimilarityIndexer;
 import be.ugent.intec.ibcn.similarity.SimilarityParameters;
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * Actual implementation of a similarity based georeferencer.
@@ -36,6 +51,11 @@ import java.util.concurrent.*;
  */
 public class SimilarityReferencer extends AbstractReferencer {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(SimilarityReferencer.class);
+
     /**
      * Test data, used for sharing between threads.
      */
@@ -56,7 +76,7 @@ public class SimilarityReferencer extends AbstractReferencer {
     @Override
     public void run(String outputFileName) {
         // Load the test data
-        System.out.println("Loading test from " + parameters.getTestFile());
+        LOG.info("Loading test from {}", parameters.getTestFile());
         DataLoading dl = new DataLoading();
         // Data is loaded WITHOUT feature selection
         this.test_data = dl.loadDataFromFile(parameters.getTestFile(), 
@@ -91,10 +111,10 @@ public class SimilarityReferencer extends AbstractReferencer {
                         + "Test item id " + i);
         }
 
-        System.out.println("Calculating similarities");
+        LOG.info("Calculating similarities");
         // Print some stats
-        System.out.println("Clustering " + parameters.getClassMapper().size() + 
-                " for " + class_items.size() + " classes.");
+        LOG.info("Clustering {}: actual used classes {}.", 
+        		parameters.getClassMapper().size(), class_items.size());
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
         // Prepare a list for the futures
@@ -117,7 +137,7 @@ public class SimilarityReferencer extends AbstractReferencer {
 	            batches_launched++;
         	}
         }
-        System.out.println("Similarity batches launched: " + batches_launched);
+        LOG.info("Similarity batches launched: {}", batches_launched);
         // Prepare the results
         Map<Integer, Point> predictions = new TreeMap<Integer, Point>();
         // Retrieve the results
@@ -132,7 +152,7 @@ public class SimilarityReferencer extends AbstractReferencer {
             }
             // Report similarity progress every 25 batches
             if (++counter % 25 == 0)
-                System.out.println(counter + "/" + batches_launched);
+                LOG.info("{}/{}", counter, batches_launched);
         }
         // This will make the executor accept no new threads
         // and finish all existing threads in the queue
@@ -192,7 +212,7 @@ public class SimilarityReferencer extends AbstractReferencer {
                         filter.add((String)f);
                 }
                 else {
-                    System.err.println("This should not happen!? " + i);
+                    LOG.error("This should not happen!? {}", i);
                 }
             }
             

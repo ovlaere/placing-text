@@ -1,5 +1,24 @@
 package be.ugent.intec.ibcn.geo.classifier;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.Util;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItemHome;
@@ -7,12 +26,6 @@ import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import be.ugent.intec.ibcn.geo.common.interfaces.LineParserDataItem;
 import be.ugent.intec.ibcn.geo.common.io.DataLoading;
 import be.ugent.intec.ibcn.geo.common.io.FileIO;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * This class provides an implementation of a Naive Bayes classifier 
@@ -50,6 +63,11 @@ import java.util.concurrent.*;
  */
 public class NaiveBayes {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(NaiveBayes.class);
+	
     /**
      * Holds the number of classes to process in one batch.
      */
@@ -129,7 +147,7 @@ public class NaiveBayes {
      */
     public void classify() {
         // Load the test data
-        System.out.println("Loading test from " + parameters.getTestFile());
+        LOG.info("Loading test from {}", parameters.getTestFile());
         DataLoading dl = new DataLoading();
         this.test_data = dl.loadDataFromFile(parameters.getTestFile(), 
                 parameters.getTestParser(), parameters.getTestLimit(), 
@@ -254,7 +272,7 @@ public class NaiveBayes {
          * @param end End of the class IDs to process in this batch.
          */
         public void trainMultinomial(int begin, int end) {
-            System.out.println("== Init multinomial Naive Bayes model [ " + 
+            LOG.info("== Init multinomial Naive Bayes model [ " + 
                     begin+" - "+end+" | " + parameters.getClassMapper().size() + 
                     " ]. ==");
             long t1 = System.currentTimeMillis();
@@ -267,7 +285,7 @@ public class NaiveBayes {
             // Prepare the priors
             this.priors = new double[rows - 1];
             long t2 = System.currentTimeMillis();
-            System.out.println(" [OK. "+(t2-t1)+" ms.]");
+            LOG.info(" [OK. "+(t2-t1)+" ms.]");
             // Get the parser
             LineParserDataItem parser = (LineParserDataItem)
                     Util.getParser(parameters.getTrainingParser());
@@ -326,11 +344,11 @@ public class NaiveBayes {
                     counter++;
                     // Report every one million items processed
                     if (counter % 1000000 == 0)
-                        System.out.println(counter);
+                        LOG.info("{}", counter);
                 }                
                 in.close();
             } catch (IOException e) {
-                System.err.println("IOException: " + e.getMessage());
+                LOG.error("IOException: {}", e.getMessage());
             }
 
             // Maximum likelihood prior based on training items in this class
@@ -339,9 +357,9 @@ public class NaiveBayes {
                 this.priors[classId] = Math.log(this.priors[classId] / this.n);
             // Stop the init timer
             long t3 = System.currentTimeMillis();
-            System.out.println("[Init OK. "+(t3-t2)+" ms.]");
+            LOG.info("[Init OK. "+(t3-t2)+" ms.]");
             // Train the model on the statistics gathered
-            System.out.println("== Training multinomial Naive Bayes model. ==");
+            LOG.info("== Training multinomial Naive Bayes model. ==");
             // Start timer
             long start = System.currentTimeMillis();
             // Prepare a threadpool
@@ -357,11 +375,11 @@ public class NaiveBayes {
             while (!executor.isTerminated()) {}
             // Stop the itmer and publish statistics
             long stop = System.currentTimeMillis();
-            System.out.println("Training complete. (" + 
+            LOG.info("Training complete. (" + 
                     (stop - start) + " ms.)");
-            System.out.println(" [nb_model] classes  : " + 
+            LOG.info(" [nb_model] classes  : " + 
                     (nb_model.length - 1));
-            System.out.println(" [nb_model] features : " + 
+            LOG.info(" [nb_model] features : " + 
                     (nb_model[0].length - 1));        
         }
 
@@ -435,7 +453,7 @@ public class NaiveBayes {
          * @param intermediateFile filename for the intermediate results 
          */
         public void evaluate(DataItem[] test_data, String intermediateFile) {
-            System.out.println("== Applying multinomial Naive Bayes model. ==");
+            LOG.info("== Applying multinomial Naive Bayes model. ==");
             long start = System.currentTimeMillis();
 
             ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
@@ -457,12 +475,12 @@ public class NaiveBayes {
                 PrintWriter results = new PrintWriter(
                         new FileWriter(intermediateFile), true);
                 int results_counter = 0;
-                System.out.println("Merging individual thread result files");
+                LOG.info("Merging individual thread result files");
                 long start_merge = System.currentTimeMillis();
                 for (Future<File> future : list) {
                     try {
                         File tmp_file = future.get();
-                        System.out.println("Processing " + tmp_file.getName());
+                        LOG.info("Processing " + tmp_file.getName());
                         BufferedReader input = new BufferedReader(
                                 new FileReader(tmp_file));
                         String line = input.readLine();
@@ -484,12 +502,11 @@ public class NaiveBayes {
                 }
                 results.close();
                 long stop_merge = System.currentTimeMillis();
-                System.out.println("Merge complete ("+(stop_merge-start_merge)
+                LOG.info("Merge complete ("+(stop_merge-start_merge)
                         +" ms.)");
-                System.out.println("Lines: " + results_counter);
+                LOG.info("Lines: " + results_counter);
             } catch (IOException e) {
-                System.err.println("IOException during writing of predictions: "
-                        + e.getMessage());
+                LOG.error("IOException during writing of predictions: {}", e.getMessage());
             }
             // This will make the executor accept no new threads
             // and finish all existing threads in the queue
@@ -498,11 +515,11 @@ public class NaiveBayes {
             while (!executor.isTerminated()) {}
             // Stop the itmer and publish statistics
             long stop = System.currentTimeMillis();
-            System.out.println("=============== [NaiveBayes] Results: ======="
+            LOG.info("=============== [NaiveBayes] Results: ======="
                     + "========");
-            System.out.println("Total processing time: " + (stop - start) + 
+            LOG.info("Total processing time: " + (stop - start) + 
                     " ms.");
-            System.out.println("============================================="
+            LOG.info("============================================="
                     + "========");
         }
 
@@ -605,7 +622,7 @@ public class NaiveBayes {
                         }
                         // Publish progress on a 10K item level
                         if (processed % 10000 == 0) {
-                            System.out.println(processed);
+                            LOG.info("{}", processed);
                         }
                     }
                 }

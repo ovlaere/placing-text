@@ -1,14 +1,22 @@
 package be.ugent.intec.ibcn.geo.features;
 
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.io.DataLoading;
-import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.io.DataLoading;
+import be.ugent.intec.ibcn.geo.common.io.FeaturesIO;
 
 /**
  * This class implements a simple most used feature occurrence feature ranking.
@@ -23,6 +31,11 @@ import java.util.concurrent.*;
  */
 public class MostFrequentlyUsedFeatureRanker {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(MostFrequentlyUsedFeatureRanker.class);
+	
     /**
      * Number of threads, for multi-threaded processing.
      */
@@ -58,7 +71,7 @@ public class MostFrequentlyUsedFeatureRanker {
      * @param outputfile filename of the file to write the output to
      */
     public void process(String outputfile) {
-        System.out.println("Doing "+ getMethodName() +" feature selection.");
+        LOG.info("Doing {} feature selection.", getMethodName());
         // feature and occurence count
         Map<Object, Integer> map = new HashMap<Object, Integer>();
         // Prepare a thread pool

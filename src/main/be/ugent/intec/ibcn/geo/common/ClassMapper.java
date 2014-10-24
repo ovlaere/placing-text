@@ -1,5 +1,19 @@
 package be.ugent.intec.ibcn.geo.common;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ugent.intec.ibcn.geo.common.datatypes.Coordinate;
 import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
 import be.ugent.intec.ibcn.geo.common.datatypes.GeoClass;
@@ -7,11 +21,6 @@ import be.ugent.intec.ibcn.geo.common.datatypes.Point;
 import edu.wlu.cs.levy.CG.KDTree;
 import edu.wlu.cs.levy.CG.KeyDuplicateException;
 import edu.wlu.cs.levy.CG.KeySizeException;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Object capable of on the fly nearest-neighbour assignments to the medoids
@@ -24,7 +33,12 @@ import java.util.concurrent.Future;
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
 public class ClassMapper {
-    
+
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(ClassMapper.class);
+
     /**
      * Number of threads, for multi-threaded processing.
      */
@@ -111,10 +125,10 @@ public class ClassMapper {
             try {
                 // Insert the medoid into the KD tree with its new ID
                 localTree.insert(new Coordinate(p).doubleKey(), remappedId);
-            } catch (KeySizeException ex) {
-                System.err.println("Error: " + ex.getMessage());
-            } catch (KeyDuplicateException ex) {
-                System.err.println("Error: " + ex.getMessage());
+            } catch (KeySizeException e) {
+                LOG.error("Error: {}", e.getMessage());
+            } catch (KeyDuplicateException e) {
+                LOG.error("Error: {}", e.getMessage());
             }
             // Increment the remapped ID counter
             remappedId++;
@@ -151,13 +165,13 @@ public class ClassMapper {
                 // Fetch the remapped ID of the GeoClass that is the best match
                 try {
                     classId = neighbours.get(0);
-                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
-                    System.err.println("Uh oh...");
+                } catch (java.lang.IndexOutOfBoundsException e) {
+                    LOG.warn("Could not get a nearest neighbour, this should not happen?");
                 }
                 // Return the GeoClass from the list by direct indexing
                 return classId;
-            } catch (KeySizeException ex) {
-                System.err.println("Error: " + ex.getMessage());
+            } catch (KeySizeException e) {
+                LOG.error("Error: {}", e.getMessage());
             }
         }
         // Return null if not found
@@ -196,7 +210,7 @@ public class ClassMapper {
      * @param data The actual training data.
      */
     public void attachElements(DataItem [] data) {
-        System.out.println("Fully attaching training data to GeoClasses...");
+        LOG.info("Fully attaching training data to GeoClasses...");
         long t1 = System.currentTimeMillis();
         // Prepare a thread pool
         ExecutorService executor = Executors.newFixedThreadPool(NR_THREADS);
@@ -228,7 +242,7 @@ public class ClassMapper {
                 }
             }
             catch (Exception e) {
-                System.err.println("Exception: " + e.getMessage());
+                LOG.error("Exception: {}", e.getMessage());
                 System.exit(1);
             }
         }
@@ -238,7 +252,7 @@ public class ClassMapper {
         // Wait until all threads are finish
         while (!executor.isTerminated()) {}
         long t2 = System.currentTimeMillis();
-        System.out.println("Finished. Took "+(t2-t1)+" ms.");
+        LOG.info("Finished. Took {} ms.", (t2-t1));
     }
     
     /**

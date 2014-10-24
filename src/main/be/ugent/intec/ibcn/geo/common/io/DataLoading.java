@@ -1,8 +1,5 @@
 package be.ugent.intec.ibcn.geo.common.io;
 
-import be.ugent.intec.ibcn.geo.common.Util;
-import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
-import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,6 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ugent.intec.ibcn.geo.common.Util;
+import be.ugent.intec.ibcn.geo.common.datatypes.DataItem;
+import be.ugent.intec.ibcn.geo.common.interfaces.AbstractLineParserDataItem;
 
 /**
  * Helper class for specific data loading.
@@ -31,6 +35,11 @@ import java.util.concurrent.Executors;
 @Deprecated
 public class DataLoading {
 
+	/**
+	 * Logger.
+	 */
+	protected static final Logger LOG = LoggerFactory.getLogger(DataLoading.class);
+	
     /**
      * Constant holding the number of available threads for multithreading.
      */
@@ -64,7 +73,7 @@ public class DataLoading {
         if (processed % 5000000 == 0) {
             long time = System.currentTimeMillis() - t1;
             t1 = System.currentTimeMillis();
-            System.out.println(" ( "+time+" ms.)");
+            LOG.info(" ( {} ms.)", time);
         }
     }
 
@@ -78,7 +87,7 @@ public class DataLoading {
      */
     public DataItem[] loadDataFromFile(String filename, String lineparser, 
             int limit, Map<Object, Integer> features) {
-        System.out.println("=| Parser:  " + lineparser);
+        LOG.info("=| Parser: {}", lineparser);
         // Get the number of lines.
         int lines = FileIO.getNumberOfLines(filename);
         // Determine the number of lines to read
@@ -86,8 +95,8 @@ public class DataLoading {
             lines = limit;
         // Prepare the array for the result
         DataItem[] data = new DataItem[lines];
-        System.out.println("Loading " + lines + " data items..." + 
-                (lines == limit ? " ++ LIMITED BY VARIABLE ++" : ""));
+        LOG.info("Loading {} data items..." + (lines == limit ? " ++ LIMITED BY VARIABLE ++" : ""),
+        		lines);
         // Start the timer
         long start = System.currentTimeMillis();
         // Prepare the thread pool
@@ -114,7 +123,7 @@ public class DataLoading {
         executor.shutdown();
         // Wait until all threads are finish
         while (!executor.isTerminated()) {}
-        System.out.println();
+        LOG.info("");
         // Stop the timer
         long stop = System.currentTimeMillis();
         // Track some stats
@@ -132,10 +141,10 @@ public class DataLoading {
             }
         }
         // Print some stats
-        System.out.println("Loading complete. Non-null items: "+counter+" (" + 
-                (stop - start) + " ms.).");
-        System.out.println("+ Parser processed: " + parser_processed);
-        System.out.println("+ Parser errors   : " + parser_errors);
+        LOG.info("Loading complete. Non-null items: {} ( {} ms.).", 
+    		counter, (stop - start));
+        LOG.info("+ Parser processed: {}", parser_processed);
+        LOG.info("+ Parser errors   : {}", parser_errors);
         // Return the data
         return data;
     }
@@ -241,8 +250,8 @@ public class DataLoading {
                 file.close();
             }
             catch (IOException e){
-                System.out.println("Error loading data: " + e.getMessage());
-                System.exit(0);
+                LOG.error("Error loading data: {}", e.getMessage());
+                System.exit(1);
             }
         }
     }
