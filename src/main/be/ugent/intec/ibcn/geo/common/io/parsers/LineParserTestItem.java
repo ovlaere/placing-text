@@ -42,8 +42,14 @@ public class LineParserTestItem extends AbstractLineParserDataItem{
             // Parse the line
             String [] values = pattern_comma.split(line.toLowerCase());
             int id = Integer.parseInt(values[0]);
-            double lat = Double.parseDouble(values[2]);
-            double lon = Double.parseDouble(values[3]);
+            Double lat = -200.;
+            Double lon = -200.;
+            if (values.length > 2) {
+                if (values[2].length() > 0)
+                    lat = Double.parseDouble(values[2]);
+                if (values[3].length() > 0)
+                    lon = Double.parseDouble(values[3]);
+            }
             // Split the features
             String [] data = null;
             if (values.length >= 5)
@@ -69,6 +75,9 @@ public class LineParserTestItem extends AbstractLineParserDataItem{
         }
         catch (Exception e) {
             this.errors++;
+            System.out.println(line);
+            e.printStackTrace();
+            System.exit(1);
         }
         this.processed++;
         return item;
