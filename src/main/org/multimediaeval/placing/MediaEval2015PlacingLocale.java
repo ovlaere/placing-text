@@ -64,7 +64,7 @@ import java.util.List;
  * 
  * @author Olivier Van Laere <oliviervanlaere@gmail.com>
  */
-public class MediaEval2015Placing {
+public class MediaEval2015PlacingLocale {
     
     public static void main(String[] args) {
         
@@ -272,7 +272,8 @@ public class MediaEval2015Placing {
         }
         
         /**
-         * Analyze the results.
+         * Analyze the results. Will default to random errors with
+         * a real test set.
          */
         
         // Prepare the classifier parameters
