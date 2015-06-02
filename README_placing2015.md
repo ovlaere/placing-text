@@ -1,14 +1,13 @@
-MediaEval2015 Placing Task Baseline
-===================================
+MediaEval2015 Placing Task LOCALE sub-task Baseline
+===================================================
 
 # Introduction
 
-This branch of [placing-text][placing-text] publishes the code used to run a baseline for the [MediaEval 2015][MediaEval] Placing Task. This year's task consists of 4 695 149 training photos and videos, while the test set contains 949 889 items. The data for this task is a subset of the [Yahoo Flickr Creative Commons 100M dataset][YFCC100M]. The hashes of the photos and videos to be used from the dataset have been distributed among the participants to the [Placing Task][Placing].
-
+This branch of [placing-text][placing-text] publishes the code used to run a baseline for the [MediaEval 2015][MediaEval] Placing Task **LOCALE** sub-task. This year's task consists of 4 695 149 training photos and videos, while the test set contains 949 889 items. The data for this sub-task is a subset of the [Yahoo Flickr Creative Commons 100M dataset][YFCC100M]. The hashes of the photos and videos to be used from the dataset have been distributed among the participants to the [Placing Task][Placing].
 
 In this branch, we provide scripts to extract the training and test set from the provided datasets and reproduce baseline geopredictions using the framework from [placing-text][placing-text]. Please note that this approach uses textual features only, and does not use any visual features at all.
 
-# Reproducing the baseline results
+# Reproducing the locale subtask baseline results
 
 To reproduce or verify the results from the baseline published by the 2015 Placing Task organisation, you can take the steps described below. All code was run on a Mid 2014 Macbook Pro, with a 2.2GHz Intel Core i7 processor, 16GB 1600MHz DDR3 memory and a SSD drive. All timings are relative to that system. For details about certain steps, we recommend you take a look at the actual source code of the scripts.
 
