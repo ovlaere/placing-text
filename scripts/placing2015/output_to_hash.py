@@ -32,7 +32,7 @@ def main():
 		
 		id = pieces[0]
 		lat = pieces[1]
-		lon = pieces[1]
+		lon = pieces[2]
 
 		print "%s;%s;%s" % (mapping[id], lat, lon)
 
