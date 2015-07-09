@@ -11,6 +11,8 @@ In this branch, we provide scripts to extract the training and test set from the
 
 To reproduce or verify the results from the baseline published by the 2015 Placing Task organisation, you can take the steps described below. All code was run on a Mid 2014 Macbook Pro, with a 2.2GHz Intel Core i7 processor, 16GB 1600MHz DDR3 memory and a SSD drive. All timings are relative to that system. For details about certain steps, we recommend you take a look at the actual source code of the scripts.
 
+Note: the Python code reportedly only works on version 2.x (which was used in development), it is untested on version 3.
+
 ## Preparing the input data
 
 	# Clone the repo
