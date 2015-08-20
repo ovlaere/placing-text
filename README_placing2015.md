@@ -104,6 +104,15 @@ The georeferencer will output the data using IDs instead of hashes. The final st
 
 The file `data/placing2015/me15pt_[subtask]_[group]_[run].txt` will then contain a valid submission.
 
+## Evaluation
+
+In the folder `scripts/placing2015` you can find the code for generating the distance based evaluation results using Karney's distance. This requires the `geographiclib` for Python and `numpy`. If you have the required modules installed, you can evaluate a submission for the mobility or locale task using the command:
+
+	python ./scripts/placing2015/evaluation_karney.py data/placing2015/ground.[locale|mobility].csv.bz2 \
+	<submission_file> <submission_file> ...
+
+The script will generate in the same folder as `submission_file` a file called `submission_file.evaluation.tsv` with the results.
+
 ## Questions/Issues
 
 If you have any problems using this code, just let me know via oliviervanlaere@gmail.com.
