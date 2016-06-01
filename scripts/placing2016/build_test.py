@@ -41,9 +41,7 @@ def main():
 		# close the file
 		input_stream.close()
 		# Open a write file for each of the input files
-		input_fds.append(open("%s.processed" % (inputfile), 'w'))
-		# Write the line count
-		input_fds[file_index].write("%s\n" % (len(input_to_process[file_index])))
+		input_fds.append(open("%s.processed" % (inputfile), 'a'))
 		# Increment the file_index
 		file_index += 1
 
