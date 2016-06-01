@@ -3,7 +3,7 @@ import bz2
 import datetime
 
 def main():
-	report_size = 100000
+	report_size = 250000
 	SEPARATOR="DATA"
 	if len(sys.argv) < 4:
 		print "Missing arguments: inputfiles*.bz2 %s data_file*.bz2" % (SEPARATOR)
@@ -14,8 +14,6 @@ def main():
 	for i in range(1,len(sys.argv)):
 		if sys.argv[i] == SEPARATOR:
 			cutoff = i
-
-	print cutoff
 
 	input_counters = []
 	input_to_process = []
