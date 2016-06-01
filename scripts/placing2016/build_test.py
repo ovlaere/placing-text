@@ -75,10 +75,6 @@ def main():
 					# Hacky way of replacing multiple whitespaces :-)
 					tags = ' '.join(tags.split())
 
-					# For test data, this is null
-					longitude = pieces[10]
-					latitude = pieces[11]
-
 					# requested output format - tags need later postprocessing
 					# ID,...,null,null,tag tag tag tag
 					input_fds[index].write("%s,%s,,,%s\n" % (photo_id, hash, tags.strip()))
